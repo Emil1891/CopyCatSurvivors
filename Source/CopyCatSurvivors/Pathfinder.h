@@ -15,8 +15,6 @@ public:
 
 	// Called each tick from MapGrid 
 	void UpdateNodeDirections();
-	
-	~Pathfinder();
 
 private:
 	APawn* Player;
@@ -24,5 +22,8 @@ private:
 	// Makes it possible to skip pathfinding if player has not moved 
 	FVector OldPlayerLocation = FVector::Zero();
 
-	AMapGrid* Grid; 
+	AMapGrid* Grid;
+
+	// Sets cost to int_max for each node 
+	void ResetNodeCosts(); 
 };

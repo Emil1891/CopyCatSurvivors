@@ -3,10 +3,12 @@
 #include "GridNode.h"
 
 GridNode::GridNode(const bool bIsWalkable, const FVector WorldCoord, const int GridX, const int GridY) :
-	GridX(GridX), GridY((GridY)),  bWalkable(bIsWalkable), WorldCoordinate(WorldCoord)
+	GridX(GridX), GridY(GridY),  bWalkable(bIsWalkable), WorldCoordinate(WorldCoord)
 {
 }
 
-GridNode::~GridNode()
+void GridNode::SetDirection(const GridNode* TargetNode)
 {
+	Direction =  TargetNode->WorldCoordinate - WorldCoordinate;
+	Direction.Normalize();
 }

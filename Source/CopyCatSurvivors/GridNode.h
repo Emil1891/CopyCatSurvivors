@@ -12,10 +12,9 @@ class COPYCATSURVIVORS_API GridNode
 public:
 	GridNode(const bool bIsWalkable, const FVector WorldCoord, const int GridX, const int GridY);
 	GridNode() {}
-	
-	~GridNode();
 
-	void SetDirection(const FVector NewDir) { Direction = NewDir; }
+	// Sets its direction based on passed TargetNode (Node which this node should points towards)
+	void SetDirection(const GridNode* TargetNode); 
 
 	FVector GetDirection() const { return Direction; }
 

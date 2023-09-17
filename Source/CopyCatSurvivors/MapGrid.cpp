@@ -29,14 +29,10 @@ void AMapGrid::BeginPlay()
 	
 	CreateGrid();
 	
-	if(bDrawDebugStuff)
+	if(bDrawDebugStuff) 
 		DrawDebugStuff();
 
 	Pathfind = new Pathfinder(UGameplayStatics::GetPlayerPawn(this, 0), this);
-	
-	UE_LOG(LogTemp, Warning, TEXT("diameter: %f"), NodeDiameter)
-	UE_LOG(LogTemp, Warning, TEXT("Grid Length: (X: %i, Y: %i)"), GridArrayLengthX, GridArrayLengthY)
-	UE_LOG(LogTemp, Warning, TEXT("GridSize: %s"), *GridSize.ToString())
 }
 
 void AMapGrid::Tick(float DeltaSeconds)
@@ -62,8 +58,9 @@ void AMapGrid::CreateGrid()
 
 	TArray<AActor*> ActorsToIgnore;
 	TArray<AActor*> OverlappingActors;
-	
-	auto OverlapActor = GetWorld()->SpawnActor<AActor>(OverlapCheckActorClass, GetActorLocation(), FRotator::ZeroRotator); 
+
+	AActor* OverlapActor = GetWorld()->SpawnActor<AActor>(OverlapCheckActorClass, GetActorLocation(),
+	                                                      FRotator::ZeroRotator); 
 
 	for(int x = 0; x < GridArrayLengthX; x++)
 	{
@@ -107,11 +104,11 @@ GridNode* AMapGrid::GetNodeFromArray(const int IndexX, const int IndexY)
 GridNode* AMapGrid::GetNodeFromWorldLocation(const FVector WorldLoc)
 {
 	const float GridRelativeX = WorldLoc.X  - GridBottomLeftLocation.X; // position relative to grids bottom left corner 
-	const float GridRelativeY = WorldLoc.Y - GridBottomLeftLocation.Y; 
+	const float GridRelativeY = WorldLoc.Y - GridBottomLeftLocation.Y;
 
 	// checks how many nodes "fit" in the relative position for array indexes 
-	const int x = FMath::Clamp(FMath::RoundToInt((GridRelativeX / NodeDiameter) - NodeRadius), 0, GridArrayLengthX - 1);
-	const int y = FMath::Clamp(FMath::RoundToInt((GridRelativeY / NodeDiameter) - NodeRadius), 0, GridArrayLengthY - 1);
+	const int x = FMath::Clamp(FMath::RoundToInt(GridRelativeX / NodeDiameter), 0, GridArrayLengthX - 1);
+	const int y = FMath::Clamp(FMath::RoundToInt(GridRelativeY / NodeDiameter), 0, GridArrayLengthY - 1);
 
 	return GetNodeFromArray(x, y);
 }
@@ -155,4 +152,8 @@ void AMapGrid::DrawDebugStuff()
 			DrawDebugBox(GetWorld(), Node->GetWorldCoordinate(), FVector(NodeRadius, NodeRadius, 1), Color, true);
 		}
 	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("diameter: %f"), NodeDiameter)
+	UE_LOG(LogTemp, Warning, TEXT("Grid Length: (X: %i, Y: %i)"), GridArrayLengthX, GridArrayLengthY)
+	UE_LOG(LogTemp, Warning, TEXT("GridSize: %s"), *GridSize.ToString())
 }

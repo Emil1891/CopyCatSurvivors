@@ -26,6 +26,9 @@ protected:
 public:
 	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetDirectionBasedOnWorldLocation(const FVector WorldLoc) { return GetNodeFromWorldLocation(WorldLoc)->GetDirection(); }
+
 private:
 
 #pragma region DataMembers
