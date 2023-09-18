@@ -20,7 +20,9 @@ EBTNodeResult::Type UBTTask_MoveTowardsPlayer::ExecuteTask(UBehaviorTreeComponen
 
 	// Assign Owner if not already assigned 
 	if(!Owner)
-		Owner = Cast<AActor>(Blackboard->GetValueAsObject(BlackboardKey.SelectedKeyName)); 
+		Owner = Cast<AActor>(Blackboard->GetValueAsObject(BlackboardKey.SelectedKeyName));
+
+	UE_LOG(LogTemp, Warning, TEXT("Owner name: %s"), *Owner->GetActorNameOrLabel()) 
 
 	// Assign Grid if not already assigned 
 	if(!Grid)
