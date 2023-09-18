@@ -3,3 +3,9 @@
 
 #include "CrazyCatCharacter.h"
 
+void ACrazyCatCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+
