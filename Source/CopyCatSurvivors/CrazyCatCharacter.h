@@ -36,18 +36,18 @@ private:
 	float CurrentHealth = 30.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
-	float LaserPointerStrength = 30.f;
+	float LaserPointerStrength = 30.f; //hur noggrant katterna ska följa den
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
 	float DashCooldown = 3.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
-	int ExtraLives = 3.f;
+	int ExtraLives = 3.f; //potentiellt också reduntadrt
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
-	int NumberOfRerolls= 30.f;
+	int NumberOfRerolls= 30.f; //uppgraderingar, när du har tillräckligt med bioamteria för uppdatering avv katt, reroll attt välja nya katter
 
-	// Outfit??
+	// skin på karaktär
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
 	FColor LaserPointerColor = FColor::Red;

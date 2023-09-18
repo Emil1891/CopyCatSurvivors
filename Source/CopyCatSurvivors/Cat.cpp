@@ -3,6 +3,7 @@
 
 #include "Cat.h"
 
+#include "CatBaseAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 
@@ -13,13 +14,16 @@ ACat::ACat()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
+	InitializeController();
 }
+
 
 ACat::ACat(const FCatStruct& CatStruct)
 {
 	Properties = CatStruct;
 	ACat();
 }
+
 
 // Called when the game starts or when spawned
 void ACat::BeginPlay()
@@ -44,5 +48,18 @@ void ACat::Tick(float DeltaTime)
 void ACat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ACat::InitializeController()
+{
+	if(bIsControllerInitialized) return;
+	bIsControllerInitialized = true;
+	ACatBaseAIController* AIController = Cast<ACatBaseAIController>(GetController());
+	if(AIController)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HAsController"));
+
+		AIController->Initialize();
+	}
 }
 

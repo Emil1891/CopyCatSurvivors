@@ -14,7 +14,15 @@ struct FCatStruct
 	GENERATED_BODY()
 	FCatStruct()
 	{
-		
+		NumClaws = 5;
+		NumLegs = 4;
+		NumTeeth = 30;
+		NumTails = 1;
+		NumEyes = 2;
+		NumHearts = 1;
+		Chonkiness = 1;
+		BrainSize = 100;
+		LungCapacity = 100;
 	}
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	double NumClaws = 5;
@@ -91,4 +99,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	/** Bool to check if controller is initialized*/
+	bool bIsControllerInitialized = false;
+
+	/** Initializes CatBaseAIController*/
+	void InitializeController();
 };
