@@ -101,7 +101,7 @@ void AMapGrid::CreateGrid()
 
 int AMapGrid::GetIndex (const int IndexX, const int IndexY) const
 {
-	return IndexX * GridArrayLengthY + IndexY;
+	return IndexX * GridArrayLengthY + IndexY; // Source: https://stackoverflow.com/a/2151113 
 }
 
 void AMapGrid::AddToArray(const int IndexX, const int IndexY, const GridNode Node)
