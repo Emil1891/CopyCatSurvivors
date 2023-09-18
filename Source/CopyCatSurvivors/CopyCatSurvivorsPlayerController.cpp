@@ -12,10 +12,8 @@
 
 ACopyCatSurvivorsPlayerController::ACopyCatSurvivorsPlayerController()
 {
-	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
-	CachedDestination = FVector::ZeroVector;
-	FollowTime = 0.f;
+	LaserPointerDestination = FVector::ZeroVector;
 }
 
 void ACopyCatSurvivorsPlayerController::BeginPlay()
@@ -30,6 +28,14 @@ void ACopyCatSurvivorsPlayerController::BeginPlay()
 	}
 }
 
+void ACopyCatSurvivorsPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	DoLaserPointer();
+}
+
+
 void ACopyCatSurvivorsPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
@@ -39,79 +45,71 @@ void ACopyCatSurvivorsPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
 		// Setup mouse input events
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ACopyCatSurvivorsPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &ACopyCatSurvivorsPlayerController::OnSetDestinationTriggered);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &ACopyCatSurvivorsPlayerController::OnSetDestinationReleased);
-		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &ACopyCatSurvivorsPlayerController::OnSetDestinationReleased);
-
-		// Setup touch input events
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ACopyCatSurvivorsPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ACopyCatSurvivorsPlayerController::OnTouchTriggered);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ACopyCatSurvivorsPlayerController::OnTouchReleased);
-		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ACopyCatSurvivorsPlayerController::OnTouchReleased);
+		EnhancedInputComponent->BindAction(MoveCatForwardAction, ETriggerEvent::Triggered, this, &ACopyCatSurvivorsPlayerController::MoveCatForward);
+		EnhancedInputComponent->BindAction(MoveCatRightAction, ETriggerEvent::Triggered, this, &ACopyCatSurvivorsPlayerController::MoveCatRight);
 	}
 }
 
-void ACopyCatSurvivorsPlayerController::OnInputStarted()
-{
-	StopMovement();
-}
 
-// Triggered every frame when the input is held down
-void ACopyCatSurvivorsPlayerController::OnSetDestinationTriggered()
+void ACopyCatSurvivorsPlayerController::MoveCatForward(const FInputActionValue& Value)
 {
-	// We flag that the input is being pressed
-	FollowTime += GetWorld()->GetDeltaSeconds();
-	
-	// We look for the location in the world where the player has pressed the input
-	FHitResult Hit;
-	bool bHitSuccessful = false;
-	if (bIsTouch)
-	{
-		bHitSuccessful = GetHitResultUnderFinger(ETouchIndex::Touch1, ECollisionChannel::ECC_Visibility, true, Hit);
-	}
-	else
-	{
-		bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
-	}
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	// If we hit a surface, cache the location
-	if (bHitSuccessful)
-	{
-		CachedDestination = Hit.Location;
-	}
-	
-	// Move towards mouse pointer or touch
+	// Get look direction
+	FRotator MoveRotation(GetControlRotation().Pitch, GetControlRotation().Yaw, 0.0f);
+
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)
 	{
-		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		// find out which way is forward
+		const FRotator Rotation = GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector ForwardDirection = MoveRotation.RotateVector(FVector::ForwardVector);
+		
+		// add movement 
+		ControlledPawn->AddMovementInput(ForwardDirection, MovementVector.X);
 	}
 }
 
-void ACopyCatSurvivorsPlayerController::OnSetDestinationReleased()
+void ACopyCatSurvivorsPlayerController::MoveCatRight(const FInputActionValue& Value)
 {
-	// If it was a short press
-	if (FollowTime <= ShortPressThreshold)
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	// Get look direction
+	FRotator MoveRotation(GetControlRotation().Pitch, GetControlRotation().Yaw, 0.0f);
+
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn != nullptr)
 	{
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		// find out which way is forward
+		const FRotator Rotation = GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector RightDirection = MoveRotation.RotateVector(FVector::RightVector);
+		
+		// add movement 
+		ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ACopyCatSurvivorsPlayerController::DoLaserPointer()
+{
+	
+	FHitResult Hit;
+	bool bHitSuccessful = false;
+	
+	bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+	
+	if (bHitSuccessful)
+	{
+		LaserPointerDestination = Hit.Location;
 	}
 
-	FollowTime = 0.f;
-}
-
-// Triggered every frame when the input is held down
-void ACopyCatSurvivorsPlayerController::OnTouchTriggered()
-{
-	bIsTouch = true;
-	OnSetDestinationTriggered();
-}
-
-void ACopyCatSurvivorsPlayerController::OnTouchReleased()
-{
-	bIsTouch = false;
-	OnSetDestinationReleased();
+	DrawDebugSphere(GetWorld(), LaserPointerDestination, 30.f, 30, FColor::Red, false, 0.1, 0, 1);
+	DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation(), LaserPointerDestination, FColor::Red, false, 0.1, 0, 1);
 }
