@@ -28,6 +28,12 @@ void ACat::BeginPlay()
 	
 }
 
+void ACat::UpdateDerivedProperties()
+{
+	Mass = Properties.Chonkiness + (Properties.NumLegs - 4) + (Properties.NumTails - 1) + Properties.BrainSize/100;
+	//Fyll på med resten av derived properties
+}
+
 // Called every frame
 void ACat::Tick(float DeltaTime)
 {

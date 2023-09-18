@@ -8,7 +8,7 @@
 
 class UBlackboardComponent;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCatStruct
 {
 	GENERATED_BODY()
@@ -16,15 +16,24 @@ struct FCatStruct
 	{
 		
 	}
-	int NumClaws = 5;
-	int NumLegs = 4;
-	int NumTails = 1;
-	int NumEyes = 2;
-	int NumHearts = 1;
-	int Chonkiness = 1;
-	int BrainSize = 100;
-	int LungCapacity = 100;
-	bool BoneLess = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumClaws = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumLegs = 4;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumTeeth = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumTails = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumEyes = 2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double NumHearts = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double Chonkiness = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double BrainSize = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double LungCapacity = 100;
 	
 };
 
@@ -49,6 +58,33 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UBlackboardComponent* BlackboardComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double Mass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double MoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double AttackSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double BiteDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double ClawDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double PounceDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double PounceDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double TrackingAccuracy;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateDerivedProperties();
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
