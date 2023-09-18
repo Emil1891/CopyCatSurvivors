@@ -91,6 +91,5 @@ private:
 	void DrawDebugStuff();
 
 #pragma endregion
-
 	
 };

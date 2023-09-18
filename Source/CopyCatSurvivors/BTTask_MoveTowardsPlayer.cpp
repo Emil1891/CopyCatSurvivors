@@ -2,6 +2,7 @@
 
 #include "BTTask_MoveTowardsPlayer.h"
 
+#include "AIController.h"
 #include "MapGrid.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -15,14 +16,6 @@ void UBTTask_MoveTowardsPlayer::OnGameplayTaskActivated(UGameplayTask& Task)
 EBTNodeResult::Type UBTTask_MoveTowardsPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-
-	const UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
-
-	// Assign Owner if not already assigned 
-	if(!Owner)
-		Owner = Cast<AActor>(Blackboard->GetValueAsObject(BlackboardKey.SelectedKeyName));
-
-	UE_LOG(LogTemp, Warning, TEXT("Owner name: %s"), *Owner->GetActorNameOrLabel()) 
 
 	// Assign Grid if not already assigned 
 	if(!Grid)
@@ -41,6 +34,9 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
+	// Apparently needs to be found/set each tick because storing it as a data member means each AI shares it :/ 
+	APawn* Owner = OwnerComp.GetAIOwner()->GetPawn();
+	
 	const FVector OwnerLoc = Owner->GetActorLocation(); 
 	
 	// If AI has reached its target, finish task as a success 
@@ -57,6 +53,7 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	// Rotate towards player 
 	const FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerLoc, Player->GetActorLocation()); 
 
+	// flip sprite if "looking backwards" 
 	if(LookAtRot.Yaw > -180 && LookAtRot.Yaw < 0)
 		Owner->SetActorScale3D(FVector(1, -1, 1));
 	else

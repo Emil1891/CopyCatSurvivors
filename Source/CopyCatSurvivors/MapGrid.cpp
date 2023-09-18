@@ -39,18 +39,24 @@ void AMapGrid::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	// TODO: REMOVE THIS, ONLY USED FOR MEASURING PERFORMANCE (not the function call) 
+	// FDateTime StartTime = FDateTime::UtcNow();
 	Pathfind->UpdateNodeDirections();
+	// const float TimeElapsedInMs = (FDateTime::UtcNow() - StartTime).GetTotalMilliseconds();
+	// UE_LOG(LogTemp, Display, TEXT("%f ms each tick to update map"), TimeElapsedInMs)
 
-	// DEBUGGING SHOWING THE NODE THAT THE PLAYER IS CURRENTLY IN
+	// DEBUGGING BELOW SHOWING THE NODE THAT THE PLAYER IS CURRENTLY IN
+
+	if(!bDrawDebugStuff)
+		return; 
+	
 	auto PlayerNode = GetNodeFromWorldLocation(UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation()); 
 	DrawDebugSphere(GetWorld(), PlayerNode->GetWorldCoordinate(), NodeRadius, 10, FColor::Cyan);
 
 	// THEN DISPLAYING ITS NEIGHBOURS 
 	for(auto N : GetNeighbours(PlayerNode))
-	{
-		if(N->IsWalkable())
+		if(N->IsWalkable()) // if it's walkable 
 			DrawDebugSphere(GetWorld(), N->GetWorldCoordinate(), NodeRadius, 10, FColor::Purple);
-	}
 }
 
 void AMapGrid::CreateGrid()
@@ -166,8 +172,6 @@ void AMapGrid::DrawDebugStuff()
 			GridNode* Node = GetNodeFromArray(x, y);
 			FColor Color = Node->IsWalkable() ? FColor::Green : FColor::Red; 
 			DrawDebugBox(GetWorld(), Node->GetWorldCoordinate(), FVector(NodeRadius, NodeRadius, 1), Color, true);
-			if(Node->GridX != -1)
-				ActualArrayCount++;
 		}
 	}
 
@@ -176,6 +180,6 @@ void AMapGrid::DrawDebugStuff()
 	UE_LOG(LogTemp, Warning, TEXT("Grid Length: (X: %i, Y: %i)"), GridArrayLengthX, GridArrayLengthY)
 	UE_LOG(LogTemp, Warning, TEXT("GridSize: %s"), *GridSize.ToString())
 
-	UE_LOG(LogTemp, Warning, TEXT("Actual array count: %i"), ActualArrayCount)
+	UE_LOG(LogTemp, Warning, TEXT("Number of nodes: %i"), GridArrayLengthX * GridArrayLengthY)
 	
 }

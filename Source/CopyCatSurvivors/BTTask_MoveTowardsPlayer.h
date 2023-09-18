@@ -37,7 +37,4 @@ private:
 
 	UPROPERTY()
 	APawn* Player;
-
-	UPROPERTY()
-	AActor* Owner; 
 };

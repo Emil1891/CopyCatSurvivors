@@ -20,7 +20,7 @@ private:
 	APawn* Player;
 
 	// Makes it possible to skip pathfinding if player has not moved 
-	FVector OldPlayerLocation = FVector::Zero();
+	class GridNode* OldPlayerNode = nullptr; 
 
 	AMapGrid* Grid;
 
