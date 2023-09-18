@@ -73,14 +73,15 @@ private:
 
 	void AddToArray(const int IndexX, const int IndexY, const GridNode Node);
 
-	GridNode* GetNodeFromArray(const int IndexX, const int IndexY);
+	GridNode* GetNodeFromArray(const int IndexX, const int IndexY) const;
 
-	GridNode* GetNodeFromWorldLocation(const FVector WorldLoc);
+	GridNode* GetNodeFromWorldLocation(const FVector WorldLoc) const;
 
-	TArray<GridNode*> GetNeighbours(const GridNode* Node); 
+	TArray<GridNode*> GetNeighbours(const GridNode* Node) const;
+
+	int GetIndex(const int IndexX, const int IndexY) const; 
 
 #pragma endregion 
-	
 
 #pragma region Debugging
 

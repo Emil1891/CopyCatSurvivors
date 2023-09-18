@@ -25,5 +25,7 @@ private:
 	AMapGrid* Grid;
 
 	// Sets cost to int_max for each node 
-	void ResetNodeCosts(); 
+	void ResetNodeCosts();
+
+	void SetDirectionInUnwalkableNode(class GridNode* NeighbourNode); 
 };

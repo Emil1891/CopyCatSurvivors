@@ -39,20 +39,31 @@ void AMapGrid::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	Pathfind->UpdateNodeDirections(); 
+	Pathfind->UpdateNodeDirections();
+
+	// DEBUGGING SHOWING THE NODE THAT THE PLAYER IS CURRENTLY IN
+	auto PlayerNode = GetNodeFromWorldLocation(UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation()); 
+	DrawDebugSphere(GetWorld(), PlayerNode->GetWorldCoordinate(), NodeRadius, 10, FColor::Cyan);
+
+	// THEN DISPLAYING ITS NEIGHBOURS 
+	for(auto N : GetNeighbours(PlayerNode))
+	{
+		if(N->IsWalkable())
+			DrawDebugSphere(GetWorld(), N->GetWorldCoordinate(), NodeRadius, 10, FColor::Purple);
+	}
 }
 
 void AMapGrid::CreateGrid()
 {
-	GridArrayLengthX = FMath::RoundToInt(GridSize.X / NodeRadius);
-	GridArrayLengthY = FMath::RoundToInt(GridSize.Y / NodeRadius);
+	GridArrayLengthX = FMath::RoundToInt(GridSize.X / NodeDiameter);
+	GridArrayLengthY = FMath::RoundToInt(GridSize.Y / NodeDiameter);
 
 	Nodes = new GridNode[GridArrayLengthX * GridArrayLengthY]; 
 
 	// The grid's pivot is in the center, need its position as if pivot was in the bottom left corner 
 	FVector GridBottomLeft = GetActorLocation();
-	GridBottomLeft.X -= GridSize.X;
-	GridBottomLeft.Y -= GridSize.Y;
+	GridBottomLeft.X -= GridSize.X / 2;
+	GridBottomLeft.Y -= GridSize.Y / 2;
 
 	GridBottomLeftLocation = GridBottomLeft; 
 
@@ -61,14 +72,14 @@ void AMapGrid::CreateGrid()
 
 	AActor* OverlapActor = GetWorld()->SpawnActor<AActor>(OverlapCheckActorClass, GetActorLocation(),
 	                                                      FRotator::ZeroRotator); 
-
+	
 	for(int x = 0; x < GridArrayLengthX; x++)
 	{
 		for(int y = 0; y < GridArrayLengthY; y++)
 		{
 			FVector NodePos = GridBottomLeft;
 			NodePos.X += x * NodeDiameter + NodeRadius; // Pos now in node center 
-			NodePos.Y  += y * NodeDiameter + NodeRadius;
+			NodePos.Y += y * NodeDiameter + NodeRadius;
 
 			// The lines below would be better but they dont seem to work? Should try again when a level is in place
 			// because they seem to detect some (handplaced?) objects? 
@@ -82,38 +93,40 @@ void AMapGrid::CreateGrid()
 			OverlapActor->SetActorLocation(NodePos);
 			OverlapActor->GetOverlappingActors(OverlappingActors);
 
-			AddToArray(x, y, GridNode(OverlappingActors.IsEmpty(), NodePos,  x, y)); 
-			
+			AddToArray(x, y, GridNode(OverlappingActors.IsEmpty(), NodePos,  x, y));
 		}
 	}
 	OverlapActor->Destroy(); 
 }
 
+int AMapGrid::GetIndex (const int IndexX, const int IndexY) const
+{
+	return IndexX * GridArrayLengthY + IndexY;
+}
+
 void AMapGrid::AddToArray(const int IndexX, const int IndexY, const GridNode Node)
 {
-	const int Index = IndexX * GridArrayLengthX + IndexY; 
-	Nodes[Index] = Node;
+	Nodes[GetIndex(IndexX, IndexY)] = Node;
 }
 
-GridNode* AMapGrid::GetNodeFromArray(const int IndexX, const int IndexY)
+GridNode* AMapGrid::GetNodeFromArray(const int IndexX, const int IndexY) const
 {
-	const int Index = IndexX * GridArrayLengthX + IndexY;
-	return &Nodes[Index]; 
+	return &Nodes[GetIndex(IndexX, IndexY)]; 
 }
 
-GridNode* AMapGrid::GetNodeFromWorldLocation(const FVector WorldLoc)
+GridNode* AMapGrid::GetNodeFromWorldLocation(const FVector WorldLoc) const
 {
 	const float GridRelativeX = WorldLoc.X  - GridBottomLeftLocation.X; // position relative to grids bottom left corner 
 	const float GridRelativeY = WorldLoc.Y - GridBottomLeftLocation.Y;
 
 	// checks how many nodes "fit" in the relative position for array indexes 
-	const int x = FMath::Clamp(FMath::RoundToInt(GridRelativeX / NodeDiameter), 0, GridArrayLengthX - 1);
-	const int y = FMath::Clamp(FMath::RoundToInt(GridRelativeY / NodeDiameter), 0, GridArrayLengthY - 1);
+	const int x = FMath::Clamp(FMath::RoundToInt((GridRelativeX - NodeRadius) / NodeDiameter), 0, GridArrayLengthX - 1);
+	const int y = FMath::Clamp(FMath::RoundToInt((GridRelativeY - NodeRadius) / NodeDiameter), 0, GridArrayLengthY - 1);
 
 	return GetNodeFromArray(x, y);
 }
 
-TArray<GridNode*> AMapGrid::GetNeighbours(const GridNode* Node)
+TArray<GridNode*> AMapGrid::GetNeighbours(const GridNode* Node) const
 {
 	TArray<GridNode*> Neighbours;
 
@@ -125,8 +138,8 @@ TArray<GridNode*> AMapGrid::GetNeighbours(const GridNode* Node)
 			if(x == 0 && y == 0) // itself 
 				continue;
 
-			int GridX = Node->GridX + x; // Grid indexes 
-			int GridY = Node->GridY + y;
+			const int GridX = Node->GridX + x; // Grid indexes 
+			const int GridY = Node->GridY + y;
 
 			// if any index is out of bounds 
 			if(GridX < 0 || GridX > GridArrayLengthX - 1 || GridY < 0 || GridY > GridArrayLengthY - 1)
@@ -141,8 +154,11 @@ TArray<GridNode*> AMapGrid::GetNeighbours(const GridNode* Node)
 
 void AMapGrid::DrawDebugStuff()
 {
-	DrawDebugBox(GetWorld(), GetActorLocation(), FVector(GridSize.X, GridSize.Y, 1), FColor::Red);
+	// Draw border of grid 
+	DrawDebugBox(GetWorld(), GetActorLocation(), FVector(GridSize.X / 2, GridSize.Y / 2, 3), FColor::Red, true);
 
+	// draw each node where unwalkable nodes are red and walkable green
+	int ActualArrayCount = 0; 
 	for(int x = 0; x < GridArrayLengthX; x++)
 	{
 		for(int y = 0; y < GridArrayLengthY; y++)
@@ -150,10 +166,16 @@ void AMapGrid::DrawDebugStuff()
 			GridNode* Node = GetNodeFromArray(x, y);
 			FColor Color = Node->IsWalkable() ? FColor::Green : FColor::Red; 
 			DrawDebugBox(GetWorld(), Node->GetWorldCoordinate(), FVector(NodeRadius, NodeRadius, 1), Color, true);
+			if(Node->GridX != -1)
+				ActualArrayCount++;
 		}
 	}
-	
+
+	// prints some stuff 
 	UE_LOG(LogTemp, Warning, TEXT("diameter: %f"), NodeDiameter)
 	UE_LOG(LogTemp, Warning, TEXT("Grid Length: (X: %i, Y: %i)"), GridArrayLengthX, GridArrayLengthY)
 	UE_LOG(LogTemp, Warning, TEXT("GridSize: %s"), *GridSize.ToString())
+
+	UE_LOG(LogTemp, Warning, TEXT("Actual array count: %i"), ActualArrayCount)
+	
 }

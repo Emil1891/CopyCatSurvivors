@@ -28,7 +28,7 @@ public:
 
 	int GridX = -1;
 	int GridY = -1; 
-
+	
 private:
 	// Direction where the AI should walk if standing on this node 
 	FVector Direction = FVector::Zero();
@@ -39,5 +39,6 @@ private:
 	FVector WorldCoordinate;
 
 	// Cost to get to this node 
-	int Cost = INT_MAX; 
+	int Cost = INT_MAX;
+
 };

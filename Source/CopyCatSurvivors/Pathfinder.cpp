@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Pathfinder.h"
-
 #include "MapGrid.h"
 
 namespace // helper functions 
@@ -45,6 +44,8 @@ void Pathfinder::UpdateNodeDirections()
 
 	ToBeVisited.Add(TargetNode);
 
+	static bool bHasSetDirInUnwalkableNodes = false; 
+
 	while(!ToBeVisited.IsEmpty())
 	{
 		// Set current to the first item in the array, then remove it 
@@ -55,12 +56,16 @@ void Pathfinder::UpdateNodeDirections()
 		// For each neighbouring node 
 		for(auto NeighbourNode : Grid->GetNeighbours(Current))
 		{
-			// Check if it's walkable, TODO: AI can get stuck in unwalkable nodes when moving diagonally (I think)
-			// TODO: so the unwalkable nodes prob also needs a direction, for now I just set it towards the current node 
-			if(!NeighbourNode->IsWalkable())
+			// Check if it's walkable, if it is, set its direction to nearest walkable node so if AI walks into an
+			// unwalkable node, it will be repelled away. i dont know if this is the best solution to the problem
+			if(!NeighbourNode->IsWalkable()) 
 			{
-				NeighbourNode->SetDirection(Current);
-				continue;
+				// their direction only needs to be set once, assuming the map does not change 
+				if(bHasSetDirInUnwalkableNodes)
+					continue;
+				
+				// if not set, then set 
+				SetDirectionInUnwalkableNode(NeighbourNode);
 			}
 
 			// Get cost to travel to neighbor from current node (diagonal = 14, otherwise 10)
@@ -86,6 +91,31 @@ void Pathfinder::UpdateNodeDirections()
 			}
 		}
 	}
+	bHasSetDirInUnwalkableNodes = true; // set to true so it is only checked/set once 
+}
+
+void Pathfinder::SetDirectionInUnwalkableNode(GridNode* NeighbourNode)
+{
+	// set lowest cost away to int max 
+	int LowestCostAwayFromNode = INT_MAX;
+	// then visit each neighbour 
+	for(const auto NeighbourToNeighbour : Grid->GetNeighbours(NeighbourNode))
+	{
+		// if neighbour is walkable and has a lower cost than lowest
+		const int CostToNeighbour = CostToNode(NeighbourNode, NeighbourToNeighbour); 
+		if(NeighbourToNeighbour->IsWalkable() && CostToNeighbour < LowestCostAwayFromNode)
+		{
+			// then set direction to that neighbouring node 
+			NeighbourNode->SetDirection(NeighbourToNeighbour);
+			LowestCostAwayFromNode = CostToNeighbour; 
+		}
+	}
+
+	// DEBUGGING DRAWING DIRECTION IN UNWALKABLE NODES 
+	if(Grid->bDrawDebugStuff)
+		DrawDebugLine(Grid->GetWorld(), NeighbourNode->GetWorldCoordinate() + FVector::UpVector * 10,
+		NeighbourNode->GetWorldCoordinate() + NeighbourNode->GetDirection() * 20 + FVector::UpVector * 10,
+		FColor::Cyan, true, -1, 0, 5);
 }
 
 void Pathfinder::ResetNodeCosts()

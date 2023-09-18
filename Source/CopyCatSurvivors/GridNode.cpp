@@ -9,6 +9,6 @@ GridNode::GridNode(const bool bIsWalkable, const FVector WorldCoord, const int G
 
 void GridNode::SetDirection(const GridNode* TargetNode)
 {
-	Direction =  TargetNode->WorldCoordinate - WorldCoordinate;
+	Direction = TargetNode->WorldCoordinate - WorldCoordinate;
 	Direction.Normalize();
 }
