@@ -3,6 +3,8 @@
 
 #include "CatManager.h"
 #include "Cat.h"
+#include "CrazyCatCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACatManager::ACatManager()
@@ -16,7 +18,13 @@ ACatManager::ACatManager()
 void ACatManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	PlayerCharacter = Cast<ACrazyCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter)
+	{
+		//set target location
+	}
+	SpawnCats();
 }
 
 // Called every frame
@@ -87,6 +95,54 @@ void ACatManager::ChangeRandomProperty(FCatStruct& Cat, double Multiplier)
 		else
 		{
 			WeightIndex -= Property.Weight;
+		}
+	}
+}
+
+void ACatManager::CalculateSpawnLocations()
+{
+	FVector InitialSpawnLocation = PlayerCharacter->GetActorLocation() + DistanceBetweenCats;
+	if(NumOfInitialCats == 1)
+	{
+		SpawnLocations.Add(InitialSpawnLocation);
+	}
+	else if(NumOfInitialCats == 2)
+	{
+		SpawnLocations.Add(FVector(InitialSpawnLocation.X, InitialSpawnLocation.Y  + DistanceBetweenCats, InitialSpawnLocation.Z));
+		SpawnLocations.Add(InitialSpawnLocation);
+	}
+	else if(NumOfInitialCats == 3)
+	{
+		SpawnLocations.Add(InitialSpawnLocation);
+		SpawnLocations.Add(FVector (InitialSpawnLocation.X + DistanceBetweenCats * FMath::Cos(60.f), InitialSpawnLocation.Y + DistanceBetweenCats * FMath::Sin(60.f), InitialSpawnLocation.Z ));
+		SpawnLocations.Add(FVector (InitialSpawnLocation.X + DistanceBetweenCats * FMath::Cos(-60.f), InitialSpawnLocation.Y + DistanceBetweenCats * FMath::Sin(-60.f), InitialSpawnLocation.Z ));
+	}
+	else if(NumOfInitialCats == 4)
+	{
+		SpawnLocations.Add(FVector(InitialSpawnLocation.X - DistanceBetweenCats, InitialSpawnLocation.Y - DistanceBetweenCats,  InitialSpawnLocation.Z ));
+		SpawnLocations.Add(FVector(InitialSpawnLocation.X - DistanceBetweenCats, InitialSpawnLocation.Y + DistanceBetweenCats,  InitialSpawnLocation.Z ));
+		SpawnLocations.Add(FVector(InitialSpawnLocation.X + DistanceBetweenCats, InitialSpawnLocation.Y + DistanceBetweenCats,  InitialSpawnLocation.Z ));
+		SpawnLocations.Add(FVector(InitialSpawnLocation.X + DistanceBetweenCats, InitialSpawnLocation.Y - DistanceBetweenCats,  InitialSpawnLocation.Z ));
+	}
+}
+
+void ACatManager::SpawnCats()
+{
+	if (!GetWorld()) return;
+	if (NumOfInitialCats != 0)
+	{		
+		CalculateSpawnLocations();
+	
+		for (FVector Loc : SpawnLocations)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+			ACat* NewCat = GetWorld()->SpawnActor<ACat>(CatClass, Loc, FRotator::ZeroRotator, SpawnParams);
+			ensure (NewCat != nullptr);
+	
+			// create struct with data, set variables in struct, assign pointer in spawned cat to that struct in array and add both cat and struct in collections
+			Cats.Add(NewCat);
 		}
 	}
 }

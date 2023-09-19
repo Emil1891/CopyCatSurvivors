@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "CatManager.generated.h"
 
+class ACrazyCatCharacter;
 struct FCatStruct;
 class ACat;
 
@@ -18,6 +19,13 @@ enum PropertyType
 USTRUCT()
 struct FWeightedAndValuedProperty
 {
+	FWeightedAndValuedProperty()
+	{
+		Type = TEnumAsByte<PropertyType>();
+		Weight = -1;
+		IncreaseValue = -1.0f;
+		DecreaseValue = -1.0f;
+	}
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere)
 	TEnumAsByte<PropertyType> Type;
@@ -61,5 +69,31 @@ public:
 private:
 	int TotalWeight = 0;
 	void ChangeRandomProperty(FCatStruct& Cat, double Multiplier);
+
+	/** Calculates spawn location based on player characters position in world space*/
+	void CalculateSpawnLocations();
+
+	/** Spawns cat instances*/
+	void SpawnCats();
+
+	/** Decides how many cats to spawn*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Spawning, meta=(AllowPrivateAccess = "true"))
+	int NumOfInitialCats = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Spawning, meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<ACat> CatClass;
+
+	/** Pointer to player character, used for spawning and setting target*/
+	ACrazyCatCharacter* PlayerCharacter;
+
+	/** Location in worlds pace toward which cats are supposed to move*/
+	FVector SpawnLocation = FVector::ZeroVector;
+
+	/** Distance between cats spawning location*/
+	float DistanceBetweenCats = 50.f;
+
+	/** List of spawn location*/
+	TArray<FVector> SpawnLocations = TArray<FVector>();
+	
 };
 
