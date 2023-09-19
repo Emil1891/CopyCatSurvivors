@@ -17,12 +17,16 @@ class COPYCATSURVIVORS_API ACrazyCatCharacter : public ACopyCatSurvivorsCharacte
 public:
 	virtual void BeginPlay() override;
 
-
 	UFUNCTION(BlueprintGetter)
 	FColor GetLaserPointerColor() const  { return LaserPointerColor; }
 
 	UFUNCTION(BlueprintGetter)
 	float GetDashCoolDown() const  { return DashCooldown; }
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintPure)
+	float GetHealthPercent() const { return CurrentHealth / InitialHealth; }
 
 private:
 
@@ -51,5 +55,14 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
 	FColor LaserPointerColor = FColor::Red;
-	
+
+	void KillMe();
+
+	// The Widget HUD class 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+
+	// The actual Widget represented on screen, created in begin play 
+	UPROPERTY()
+	UUserWidget* HUDWidget; 
 };

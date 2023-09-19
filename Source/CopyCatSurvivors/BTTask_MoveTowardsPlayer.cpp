@@ -41,10 +41,8 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	
 	// If AI has reached its target, finish task as a success 
 	if(Player->GetActorLocation().Equals(OwnerLoc, SuccessRange))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BITE!!"))
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
+	
 	// Otherwise move towards player
 	const FVector MoveDir = Grid->GetDirectionBasedOnWorldLocation(OwnerLoc);
 	const FVector NewLocDelta = MoveDir * MoveSpeed * DeltaSeconds;
@@ -53,13 +51,13 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	// Rotate towards player 
 	const FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerLoc, Player->GetActorLocation()); 
 
-	// flip sprite if "looking backwards" 
+	// flip sprite if "looking backwards" (NOTE THIS ASSUMES A SCALE OF ONE IS USED)
 	if(LookAtRot.Yaw > -180 && LookAtRot.Yaw < 0)
 		Owner->SetActorScale3D(FVector(1, -1, 1));
 	else
 		Owner->SetActorScale3D(FVector::One());
 	
-	Owner->SetActorRotation(LookAtRot); 
+	Owner->SetActorRotation(LookAtRot);
 	
 	return FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 }
