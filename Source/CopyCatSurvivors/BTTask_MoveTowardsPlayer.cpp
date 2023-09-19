@@ -49,7 +49,9 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	Owner->SetActorLocation(OwnerLoc + NewLocDelta);
 
 	// Rotate towards player 
-	const FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerLoc, Player->GetActorLocation()); 
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerLoc, Player->GetActorLocation());
+	LookAtRot.Pitch = 0; // Only want Yaw rotation (Z) so zero out the rest 
+	LookAtRot.Roll = 0; 
 
 	// flip sprite if "looking backwards" (NOTE THIS ASSUMES A SCALE OF ONE IS USED)
 	if(LookAtRot.Yaw > -180 && LookAtRot.Yaw < 0)

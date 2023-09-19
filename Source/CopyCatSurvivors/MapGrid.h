@@ -26,8 +26,16 @@ protected:
 public:
 	virtual void Tick(float DeltaSeconds) override;
 
+	// Returns the direction in the node that the WorldLocation is in 
 	UFUNCTION(BlueprintCallable)
 	FVector GetDirectionBasedOnWorldLocation(const FVector WorldLoc) { return GetNodeFromWorldLocation(WorldLoc)->GetDirection(); }
+
+	// Returns the node that the World Location is in 
+	GridNode* GetNodeFromWorldLocation(const FVector WorldLoc) const;
+	
+	FVector GetGridBottomLeftLocation() const { return GridBottomLeftLocation; }
+
+	FVector2D GetGridSize() const { return GridSize; }
 
 private:
 
@@ -75,7 +83,6 @@ private:
 
 	GridNode* GetNodeFromArray(const int IndexX, const int IndexY) const;
 
-	GridNode* GetNodeFromWorldLocation(const FVector WorldLoc) const;
 
 	TArray<GridNode*> GetNeighbours(const GridNode* Node) const;
 

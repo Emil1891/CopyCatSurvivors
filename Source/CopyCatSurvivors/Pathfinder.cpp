@@ -45,8 +45,6 @@ void Pathfinder::UpdateNodeDirections()
 
 	ToBeVisited.Add(TargetNode);
 
-	static bool bHasSetDirInUnwalkableNodes = false; 
-
 	while(!ToBeVisited.IsEmpty())
 	{
 		// Set current to the first item in the array, then remove it 

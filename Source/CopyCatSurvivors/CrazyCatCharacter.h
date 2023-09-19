@@ -34,10 +34,10 @@ private:
 	float MoveSpeed = 30.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
-	float InitialHealth = 30.f;
+	float InitialHealth = 60.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
-	float CurrentHealth = 30.f;
+	float CurrentHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
 	float LaserPointerStrength = 30.f; //hur noggrant katterna ska följa den
@@ -64,5 +64,11 @@ private:
 
 	// The actual Widget represented on screen, created in begin play 
 	UPROPERTY()
-	UUserWidget* HUDWidget; 
+	UUserWidget* HUDWidget;
+
+	// Time that the player is invincible after taking damage 
+	float GracePeriod = 0.05f;
+
+	// Keeps track of the time that the player last took damage 
+	double LastDamageTime = 0; 
 };
