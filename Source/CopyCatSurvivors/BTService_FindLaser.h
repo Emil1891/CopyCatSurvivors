@@ -15,6 +15,10 @@ class COPYCATSURVIVORS_API UBTService_FindLaser : public UBTService_BlackboardBa
 	GENERATED_BODY()
 public:
 	UBTService_FindLaser();
+
+	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
+
+	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
 	
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;

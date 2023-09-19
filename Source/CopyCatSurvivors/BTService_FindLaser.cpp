@@ -12,6 +12,16 @@ UBTService_FindLaser::UBTService_FindLaser()
 	NodeName = TEXT("Find laser pointer target location");
 }
 
+void UBTService_FindLaser::OnGameplayTaskActivated(UGameplayTask& Task)
+{
+	Super::OnGameplayTaskActivated(Task);
+}
+
+void UBTService_FindLaser::OnGameplayTaskDeactivated(UGameplayTask& Task)
+{
+	Super::OnGameplayTaskDeactivated(Task);
+}
+
 void UBTService_FindLaser::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
