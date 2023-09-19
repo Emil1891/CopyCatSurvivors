@@ -14,9 +14,10 @@ void ACatBaseAIController::Initialize()
 	// choose bt to run
 	if(BehaviorTree)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("BehaviourTReetorun %s"), *BehaviorTree->GetName());
 		RunBehaviorTree(BehaviorTree);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("BehaviourTReetorun %s"), *BehaviorTree->GetName());
+	
 	//GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), this->GetPawn()->());
 	
 }

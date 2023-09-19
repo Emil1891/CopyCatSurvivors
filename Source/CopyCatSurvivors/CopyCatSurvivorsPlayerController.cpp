@@ -128,7 +128,7 @@ void ACopyCatSurvivorsPlayerController::DoLaserPointer()
 		LaserPointerDestination = Hit.Location;
 	}
 
-	DrawDebugSphere(GetWorld(), LaserPointerDestination, 10.f, 30, LaserPointerColor, false, 0.1, 0, 1);
+	//DrawDebugSphere(GetWorld(), LaserPointerDestination, 10.f, 30, LaserPointerColor, false, 0.1, 0, 1);
 	DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation(), LaserPointerDestination, LaserPointerColor, false, 0.1, 0, 1);
 }
 
