@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "CopyCatSurvivorsPlayerController.generated.h"
 
+ class ACrazyCatCharacter;
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 
@@ -45,8 +46,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveCatRightAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* DashCatAction;
+
 	/** Destination that is target for cat army*/
 	FVector LaserPointerDestination;
+
+	/** On dash input event*/
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDashInput();
+	
 protected:
 	
 
@@ -59,9 +68,27 @@ protected:
 
 	void MoveCatForward(const FInputActionValue& Value);
 	void MoveCatRight(const FInputActionValue& Value);
+	void DashCat();
 
 	void DoLaserPointer();
+
+private:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Player, meta=(AllowPrivateAccess = "true"))
+	ACrazyCatCharacter* PlayerCharacter = nullptr;
+
+	// ======== Dash variables and methods ======/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	float DashStrength = 5.f;
 	
+	UFUNCTION(BlueprintCallable)
+	void Dash();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dash, meta=(AllowPrivateAccess = "true"))
+	float DashCooldownDuration = 0.0f;
+    
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dash, meta=(AllowPrivateAccess = "true"))
+	FColor LaserPointerColor = FColor::Green;
 };
 
 

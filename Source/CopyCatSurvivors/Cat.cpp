@@ -3,6 +3,7 @@
 
 #include "Cat.h"
 
+#include "CatBaseAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 
@@ -12,8 +13,9 @@ ACat::ACat()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
+	//BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 }
+
 
 ACat::ACat(const FCatStruct& CatStruct)
 {
@@ -21,11 +23,14 @@ ACat::ACat(const FCatStruct& CatStruct)
 	ACat();
 }
 
+
 // Called when the game starts or when spawned
 void ACat::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
+	GetWorldTimerManager().SetTimer(InitializeControllerTimerHandle, this, &ACat::InitializeController, 0.1, false, InitializeControllerDelay);
 }
 
 void ACat::UpdateDerivedProperties()
@@ -44,5 +49,18 @@ void ACat::Tick(float DeltaTime)
 void ACat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ACat::InitializeController()
+{
+	if(bIsControllerInitialized) return;
+	bIsControllerInitialized = true;
+	ACatBaseAIController* AIController = Cast<ACatBaseAIController>(GetController());
+	if(AIController)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HAsController"));
+
+		AIController->Initialize();
+	}
 }
 

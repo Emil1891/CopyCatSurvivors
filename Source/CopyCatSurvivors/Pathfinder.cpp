@@ -25,13 +25,14 @@ Pathfinder::Pathfinder(APawn* PlayerActor, AMapGrid* MapGrid) : Player(PlayerAct
 // Some inspiration from https://leifnode.com/2013/12/flow-field-pathfinding/ 
 void Pathfinder::UpdateNodeDirections()
 {
-	const FVector PlayerPos = Player->GetActorLocation();
+	const FVector PlayerPos = Player->GetActorLocation(); 
+	GridNode* PlayerNode = Grid->GetNodeFromWorldLocation(PlayerPos);
 
-	// If player has not moved, no need yo update the flow field 
-	if(PlayerPos.Equals(OldPlayerLocation))
+	// If player has not moved (standing in same node), no need to update the flow field 
+	if(PlayerNode == OldPlayerNode)
 		return;
 
-	OldPlayerLocation = PlayerPos; 
+	OldPlayerNode = PlayerNode; 
 
 	ResetNodeCosts(); 
 
@@ -39,7 +40,7 @@ void Pathfinder::UpdateNodeDirections()
 	TargetNode->SetCost(0);
 
 	// Better data structures can probably be used here 
-	TArray<GridNode*> ToBeVisited; // Holds node that should be visited
+	TArray<GridNode*> ToBeVisited; // Holds node that should be visited (LinkedList instead? needs fast removal at start)
 	TSet<GridNode*> Visited; 
 
 	ToBeVisited.Add(TargetNode);
