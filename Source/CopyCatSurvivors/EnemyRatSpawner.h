@@ -48,6 +48,19 @@ private:
 	int WaveCount = 0;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ARatCharacter> RatClass; 
+	TSubclassOf<class ARatCharacter> RatClass;
+
+	UPROPERTY(EditAnywhere, meta=(Units="cm"))
+	float MinRangeOutsideScreenToSpawn = 50.f; 
+
+	bool SpawnIsValid(const FVector& SpawnLoc) const;
+
+	bool IsWithinPlayerZone(const FVector& WorldLocation) const; 
+
+	UPROPERTY()
+	APlayerController* PlayerController; 
+
+	UPROPERTY()
+	FVector2D ViewportSize; 
 
 };

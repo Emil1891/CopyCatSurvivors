@@ -28,4 +28,6 @@ private:
 	void ResetNodeCosts();
 
 	void SetDirectionInUnwalkableNode(class GridNode* NeighbourNode); 
+
+	bool bHasSetDirInUnwalkableNodes = false; 
 };

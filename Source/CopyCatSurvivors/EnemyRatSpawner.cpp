@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "EnemyRatSpawner.h"
 
 #include "MapGrid.h"
@@ -38,8 +37,16 @@ void AEnemyRatSpawner::BeginPlay()
 	const FVector2D GridSize = Grid->GetGridSize();
 	MaxSpawnArea = MinSpawnArea;
 	MaxSpawnArea.X += GridSize.X;
-	MaxSpawnArea.Y += GridSize.Y; 
+	MaxSpawnArea.Y += GridSize.Y;
 
+	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// Used later to prevent enemies from spawning on the players screen 
+	int x, y; 
+	PlayerController->GetViewportSize(x, y);
+	ViewportSize = FVector2D(x, y); 
+
+	// Delayed to ensure Grid is set up before spawning enemies 
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AEnemyRatSpawner::SpawnNewWave); 
 }
 
@@ -60,13 +67,13 @@ void AEnemyRatSpawner::SpawnNewWave()
 	{
 		FVector SpawnLoc = FVector::Zero();
 		SpawnLoc.Z = SpawnZLoc; 
-		
-		// TODO: CHECK SO SPAWN LOC IS NOT ON PLAYER SCREEN
+
+		// TODO: Improve this, maybe spread the spawns out over frames? 
 		do
 		{
 			SpawnLoc.X = FMath::RandRange(MinSpawnArea.X, MaxSpawnArea.X); 
 			SpawnLoc.Y = FMath::RandRange(MinSpawnArea.Y, MaxSpawnArea.Y);
-		} while(!Grid->GetNodeFromWorldLocation(SpawnLoc)->IsWalkable()); // Generate new spawn point if spawn point is unwalkable 
+		} while(!SpawnIsValid(SpawnLoc)); // Generate new spawn point if spawn is not valid 
 		
 		GetWorld()->SpawnActor<AActor>(RatClass, SpawnLoc, FRotator::ZeroRotator); 
 	}
@@ -76,4 +83,29 @@ void AEnemyRatSpawner::SpawnNewWave()
 	// Set timer for when to spawn a new wave 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemyRatSpawner::SpawnNewWave, TimeBetweenSpawnWaves); 
+}
+
+// TODO: PROBABLY REPLACE THIS WITH BETTER CONSTRAINTS WHEN RANDOMIZING SPAWN LOCATION, OR AT LEAST A COMBINATION 
+bool AEnemyRatSpawner::SpawnIsValid(const FVector& SpawnLoc) const
+{
+	// if spawn location is inside an unwalkable node, it is not valid 
+	if(!Grid->GetNodeFromWorldLocation(SpawnLoc)->IsWalkable())
+		return false;
+
+	// if enemy would spawn on players screen, then it is not valid 
+	if(IsWithinPlayerZone(SpawnLoc))
+		return false; 
+
+	return true; 
+}
+
+bool AEnemyRatSpawner::IsWithinPlayerZone(const FVector& WorldLocation) const
+{
+	FVector2D ScreenLocation; 
+	PlayerController->ProjectWorldLocationToScreen(WorldLocation, ScreenLocation);
+
+	return ScreenLocation.X > -MinRangeOutsideScreenToSpawn &&
+		ScreenLocation.X < ViewportSize.X + MinRangeOutsideScreenToSpawn &&
+			ScreenLocation.Y > -MinRangeOutsideScreenToSpawn &&
+				ScreenLocation.Y < ViewportSize.Y + MinRangeOutsideScreenToSpawn; 
 }
