@@ -3,6 +3,8 @@
 
 #include "BTService_FindLaser.h"
 
+#include "AIController.h"
+#include "CopyCatSurvivorsPlayerController.h"
 #include "CrazyCatCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,7 +32,44 @@ void UBTService_FindLaser::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 	if(!PlayerPawn)
 	{
 		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerLocation");
+		GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("No player")));
 		return;
+	}
+	if (OwnerComp.GetAIOwner() == nullptr)
+	{
+		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerLocation");
+		GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("No player controller")));
+
+		return;
+	}
+		
+
+	//ACrazyCatCharacter* PlayerCharacter = Cast<ACrazyCatCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
+
+	ACrazyCatCharacter* PlayerCharacter = Cast<ACrazyCatCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!IsValid(PlayerCharacter) )
+	{
+		return;
+	}
+	ensure (PlayerCharacter != nullptr);
+
+	
+	if (PlayerCharacter->GetController())
+	{
+		GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("HAsController before cast")));
+
+		ACopyCatSurvivorsPlayerController* OwnerController = Cast<ACopyCatSurvivorsPlayerController>(PlayerCharacter->GetController());
+		if (OwnerController)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("HAsController from task")));
+			OwnerComp.GetBlackboardComponent()->SetValueAsVector("LaserPointerLocation", OwnerController->LaserPointerDestination);
+		}
+		
+	}
+	else
+	{
+		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerLocation");
+
 	}
 	
 }
