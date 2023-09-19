@@ -51,7 +51,96 @@ void ACatManager::Mutate(FCatStruct& CatStruct)
 	ChangeRandomProperty(CatStruct, -1);
 }
 
-void ACatManager::ChangeRandomProperty(FCatStruct& Cat, double Multiplier)
+FCatStruct ACatManager::Splice(FCatStruct Cat1, FCatStruct Cat2)
+{
+	FCatStruct NewCat;
+	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
+	{
+		switch (Property.Type)
+		{
+		case NumClaws:
+			NewCat.NumClaws = rand() % 2 == 0 ? Cat1.NumClaws : Cat2.NumClaws;
+			break;
+		case NumLegs:
+			NewCat.NumLegs = rand() % 2 == 0 ? Cat1.NumLegs : Cat2.NumLegs;
+			break;
+		case NumTeeth:
+			NewCat.NumTeeth = rand() % 2 == 0 ? Cat1.NumTeeth : Cat2.NumTeeth;
+			break;
+		case NumTails:
+			NewCat.NumTails = rand() % 2 == 0 ? Cat1.NumTails : Cat2.NumTails;
+			break;
+		case NumEyes:
+			NewCat.NumEyes = rand() % 2 == 0 ? Cat1.NumEyes : Cat2.NumEyes;
+			break;
+		case NumHearts:
+			NewCat.NumHearts = rand() % 2 == 0 ? Cat1.NumHearts : Cat2.NumHearts;
+			break;
+		case LungCapacity:
+			NewCat.LungCapacity = rand() % 2 == 0 ? Cat1.LungCapacity : Cat2.LungCapacity;
+			break;
+		case BrainSize:
+			NewCat.BrainSize = rand() % 2 == 0 ? Cat1.BrainSize : Cat2.BrainSize;
+			break;
+		case Chonkiness:
+			NewCat.Chonkiness = rand() % 2 == 0 ? Cat1.Chonkiness : Cat2.Chonkiness;
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+	return NewCat;
+}
+
+FCatStruct ACatManager::Fuse(FCatStruct Cat1, FCatStruct Cat2)
+{
+	FCatStruct NewCat;
+	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
+	{
+		switch (Property.Type)
+		{
+		case NumClaws:
+			NewCat.NumClaws = abs(Cat1.NumClaws - NewCat.NumClaws) > abs(Cat2.NumClaws - NewCat.NumClaws) ? Cat1.NumClaws : Cat2.NumClaws;
+			break;
+		case NumLegs:
+			NewCat.NumLegs = abs(Cat1.NumLegs - NewCat.NumLegs) > abs(Cat2.NumLegs - NewCat.NumLegs) ? Cat1.NumLegs : Cat2.NumLegs;
+			break;
+		case NumTeeth:
+			NewCat.NumTeeth = abs(Cat1.NumTeeth - NewCat.NumTeeth) > abs(Cat2.NumTeeth - NewCat.NumTeeth) ? Cat1.NumTeeth : Cat2.NumTeeth;
+			break;
+		case NumTails:
+			NewCat.NumTails = abs(Cat1.NumTails - NewCat.NumTails) > abs(Cat2.NumTails - NewCat.NumTails) ? Cat1.NumTails : Cat2.NumTails;
+			break;
+		case NumEyes:
+			NewCat.NumEyes = abs(Cat1.NumEyes - NewCat.NumEyes) > abs(Cat2.NumEyes - NewCat.NumEyes) ? Cat1.NumEyes : Cat2.NumEyes;
+			break;
+		case NumHearts:
+			NewCat.NumHearts = abs(Cat1.NumHearts - NewCat.NumHearts) > abs(Cat2.NumHearts - NewCat.NumHearts) ? Cat1.NumHearts : Cat2.NumHearts;
+			break;
+		case LungCapacity:
+			NewCat.LungCapacity = abs(Cat1.LungCapacity - NewCat.LungCapacity) > abs(Cat2.LungCapacity - NewCat.LungCapacity) ? Cat1.LungCapacity : Cat2.LungCapacity;
+			break;
+		case BrainSize:
+			NewCat.BrainSize = abs(Cat1.BrainSize - NewCat.BrainSize) > abs(Cat2.BrainSize - NewCat.BrainSize) ? Cat1.BrainSize : Cat2.BrainSize;
+			break;
+		case Chonkiness:
+			NewCat.Chonkiness = abs(Cat1.Chonkiness - NewCat.Chonkiness) > abs(Cat2.Chonkiness - NewCat.Chonkiness) ? Cat1.Chonkiness : Cat2.Chonkiness;
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+	ChangeRandomProperty(NewCat, 3);
+	ChangeRandomProperty(NewCat, 2);
+	ChangeRandomProperty(NewCat, 1);
+	ChangeRandomProperty(NewCat, -1);
+	ChangeRandomProperty(NewCat, -1);
+	return NewCat;
+}
+
+void ACatManager::ChangeRandomProperty(FCatStruct& Cat, const double Multiplier)
 {
 	int WeightIndex = rand() % TotalWeight;
 	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
@@ -79,7 +168,7 @@ void ACatManager::ChangeRandomProperty(FCatStruct& Cat, double Multiplier)
 				Cat.NumHearts += Property.IncreaseValue * Multiplier;
 				break;
 			case LungCapacity:
-				Cat.NumClaws += Property.IncreaseValue * Multiplier;
+				Cat.LungCapacity += Property.IncreaseValue * Multiplier;
 				break;
 			case BrainSize:
 				Cat.BrainSize += Property.IncreaseValue * Multiplier;

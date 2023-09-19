@@ -66,6 +66,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Mutate(FCatStruct& CatStruct);
 
+	UFUNCTION(BlueprintCallable)
+	FCatStruct Splice(FCatStruct Cat1, FCatStruct Cat2);
+
+	UFUNCTION(BlueprintCallable)
+	FCatStruct Fuse(FCatStruct Cat1, FCatStruct Cat2);
+
 private:
 	int TotalWeight = 0;
 	void ChangeRandomProperty(FCatStruct& Cat, double Multiplier);
