@@ -105,4 +105,7 @@ public:
 
 	/** Initializes CatBaseAIController*/
 	void InitializeController();
+
+	FTimerHandle InitializeControllerTimerHandle;
+	float InitializeControllerDelay = 1.f;
 };

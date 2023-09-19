@@ -9,6 +9,8 @@
 
 void ACatBaseAIController::Initialize()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Initialize in controller"), *BehaviorTree->GetName());
+
 	// choose bt to run
 	if(BehaviorTree)
 	{

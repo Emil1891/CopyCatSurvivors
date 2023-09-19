@@ -21,7 +21,10 @@ struct FWeightedAndValuedProperty
 {
 	FWeightedAndValuedProperty()
 	{
-		
+		Type = TEnumAsByte<PropertyType>();
+		Weight = -1;
+		IncreaseValue = -1.0f;
+		DecreaseValue = -1.0f;
 	}
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere)

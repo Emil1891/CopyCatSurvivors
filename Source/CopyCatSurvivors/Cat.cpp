@@ -13,8 +13,7 @@ ACat::ACat()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
-	InitializeController();
+	//BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 }
 
 
@@ -29,7 +28,9 @@ ACat::ACat(const FCatStruct& CatStruct)
 void ACat::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
+	GetWorldTimerManager().SetTimer(InitializeControllerTimerHandle, this, &ACat::InitializeController, 0.1, false, InitializeControllerDelay);
 }
 
 void ACat::UpdateDerivedProperties()
