@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "Cat.h"
+#include "CopyCatSurvivorsPlayerController.h"
 #include "CrazyCatCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "RatCharacter.h"
@@ -36,25 +37,27 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	}
 	ensure (PlayerCharacter != nullptr);
 
-	// Make a sphere trace from where cat is to detect enemy rats
+	
 	if (OwnerComp.GetAIOwner() == nullptr) return;
 
 	ACat* CatCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetCharacter());
 
 	if (CatCharacter == nullptr) return;
 
+	// Make a sphere from cats location as large as defined radius
 	const FVector MyLocation = CatCharacter->GetActorLocation();
-	const FVector MidwayPoint = MyLocation + (MyLocation  - FindRatsRadius) / 2;
+	//const FVector MidwayPoint = MyLocation + MyLocation.ForwardVector * FindRatsRadius;
 	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(FindRatsRadius); //TODO: Detta borde vara en distance som sätts i katten, alternativt en radius i bb
 	FCollisionObjectQueryParams Params = FCollisionObjectQueryParams();
-	Params.AddObjectTypesToQuery(ECC_GameTraceChannel8);
+	Params.AddObjectTypesToQuery(ECC_Pawn);
 	TArray<FOverlapResult> OverlapResults;
 
-	DrawDebugSphere(GetWorld(), MidwayPoint, FindRatsRadius, 24, FColor::Turquoise, false, .5f);
-	
+	DrawDebugSphere(GetWorld(), MyLocation, FindRatsRadius, 24, FColor::Turquoise, false, .5f);
+
+	// check if sphere overlaps with any rats
 	bool bOverlaps = GetWorld()->OverlapMultiByObjectType(
 		OverlapResults,
-		MidwayPoint,
+		MyLocation,
 		FQuat::Identity,
 		Params,
 		CheckSphereShape);
@@ -63,22 +66,32 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 		for(FOverlapResult Overlap : OverlapResults)
 		{
 			ARatCharacter* RatCharacter = Cast<ARatCharacter>(Overlap.GetActor());
+			// if overlap is found, set values in bb and remove laser point target location, and break (maybe, trying different things)
 			if (RatCharacter && IsValid(RatCharacter))
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsVector("ClosestRatLocation", RatCharacter->GetActorLocation());
-				
+				OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget");
+
+				DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
+
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", true);
-				break;
-				//TODO: Sätta en bool i bb som säger att vi hittat råttor och en rått-location. Sen - I Pounce task - gör en sfär runt råttan och launch character mot den sålänge cooldown tillåter det
-				//TODO: När cat är nära target point och inget annat händer - spring i cirklar.
-				// TODO: Om cat är ännu närmare rat så ska den gå in i en sekvens av bite + claw.
+				//break;
 			}
 		}
 	}
 	else
 	{
+		// if no overlaps found, clear values and reset laser point target
 		OwnerComp.GetBlackboardComponent()->ClearValue("ClosestRatLocation");
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", false);
+		OwnerComp.GetBlackboardComponent()->ClearValue("bFoundRatsWithinPounceRadius");
+		if (PlayerCharacter->GetController())
+		{
+			ACopyCatSurvivorsPlayerController* OwnerController = Cast<ACopyCatSurvivorsPlayerController>(PlayerCharacter->GetController());
+			if (OwnerController)
+			{
+				OwnerComp.GetBlackboardComponent()->SetValueAsVector("LaserPointerTarget", OwnerController->LaserPointerDestination);
+			}
+		}
 	}
 }
 
