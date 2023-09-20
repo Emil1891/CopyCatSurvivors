@@ -40,14 +40,13 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	
 	if (OwnerComp.GetAIOwner() == nullptr) return;
 
-	ACat* CatCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetCharacter());
+	ACat* OwnerCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetCharacter());
 
-	if (CatCharacter == nullptr) return;
+	if (OwnerCharacter == nullptr) return;
 
 	// Make a sphere from cats location as large as defined radius
-	const FVector MyLocation = CatCharacter->GetActorLocation();
-	//const FVector MidwayPoint = MyLocation + MyLocation.ForwardVector * FindRatsRadius;
-	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(FindRatsRadius); //TODO: Detta borde vara en distance som sätts i katten, alternativt en radius i bb
+	const FVector MyLocation = OwnerCharacter->GetActorLocation();
+	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(FindRatsRadius); //TODO: Radius should be OwnerCharacter->PounceDistance
 	FCollisionObjectQueryParams Params = FCollisionObjectQueryParams();
 	Params.AddObjectTypesToQuery(ECC_Pawn);
 	TArray<FOverlapResult> OverlapResults;
@@ -61,6 +60,7 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 		FQuat::Identity,
 		Params,
 		CheckSphereShape);
+	
 	if(bOverlaps)
 	{
 		for(FOverlapResult Overlap : OverlapResults)
@@ -70,28 +70,57 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 			if (RatCharacter && IsValid(RatCharacter))
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsVector("ClosestRatLocation", RatCharacter->GetActorLocation());
-				OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget");
-
+				//tried having this service clear and set laser point target location, could be nice when balancing tree 
+				
 				DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
 
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", true);
-				//break;
 			}
 		}
+		// KOD SOM CRASHADE MEN JAG ÄR FÖR TRÖTT
 	}
+	
 	else
 	{
-		// if no overlaps found, clear values and reset laser point target
+		// if no overlaps found, clear values (and reset laser point target if we want)
 		OwnerComp.GetBlackboardComponent()->ClearValue("ClosestRatLocation");
 		OwnerComp.GetBlackboardComponent()->ClearValue("bFoundRatsWithinPounceRadius");
-		if (PlayerCharacter->GetController())
-		{
-			ACopyCatSurvivorsPlayerController* OwnerController = Cast<ACopyCatSurvivorsPlayerController>(PlayerCharacter->GetController());
-			if (OwnerController)
-			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsVector("LaserPointerTarget", OwnerController->LaserPointerDestination);
-			}
-		}
+		
 	}
 }
 
+
+
+/*  
+		int IndexOfClosestRat = 0;
+		float MinDistance = 1000000000.0f;
+		for (int Index = 0; Index <= OverlapResults.Num(); Index++)
+		{
+			ARatCharacter* RatCharacter = Cast<ARatCharacter>(OverlapResults[Index].GetActor());
+
+			DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
+
+			// Calculate the distance between this character and rat
+			float Distance = FVector::Distance(CatCharacter->GetActorLocation(), RatCharacter->GetActorLocation());
+
+			// if overlap is found, check validity and set index of closest rat to the index of the rat
+			if (RatCharacter && IsValid(RatCharacter))
+			{
+				if (Distance < MinDistance)
+				{
+					IndexOfClosestRat = Index;
+					MinDistance = Distance;
+				}
+			}
+		}
+		
+
+		// set values in bb and remove laser point target location, and break (maybe, trying different things)
+		
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector("ClosestRatLocation", OverlapResults[IndexOfClosestRat].GetActor()->GetActorLocation());
+		//tried having this service clear and set laser point target location, could be nice when balancing tree 
+		//OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget"); 
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", true);
+		*/
+	
+	

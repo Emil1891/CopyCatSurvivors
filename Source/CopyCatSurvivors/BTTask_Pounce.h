@@ -6,6 +6,7 @@
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "BTTask_Pounce.generated.h"
 
+class ACat;
 /**
  * 
  */
@@ -26,8 +27,14 @@ public:
 
 	/** Constructor*/
 	UBTTask_Pounce();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPounceAttack();
 private:
 
+	/** Makes a sphere around pounce target to do damage on found rats around the main one*/
+	void MakePounceAreaDamage();
+	
 	/** Force to launch character toward target*/
 	UPROPERTY(EditAnywhere)
 	float PounceForce = 40.f;
@@ -38,6 +45,10 @@ private:
 
 	/** Timer to check cool down*/
 	float PounceCooldownTimer = 0.0f;
+
+	/** Radius for radial pounce damage*/
+	UPROPERTY(EditAnywhere)
+	float PounceDamageRadius = 50.f;
 
 	/** Speed when returning to start position*/
 	UPROPERTY(EditAnywhere)
@@ -52,5 +63,19 @@ private:
 
 	/** Is true when cat is performing the pouncing attack*/	
 	bool bPouncing;
+
+	// timer and delay for moving character back
+	FTimerHandle RetreatTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float RetreatDelay = 0.3f;
+
+	void MoveCharacterBack();
+
+	UPROPERTY()
+	ACat* OwnerCharacter;
+
+	UPROPERTY(EditAnywhere)
+	bool bDebug = false;
 	
 };
