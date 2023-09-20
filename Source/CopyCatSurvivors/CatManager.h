@@ -74,7 +74,7 @@ public:
 
 private:
 	int TotalWeight = 0;
-	void ChangeRandomProperty(FCatStruct& Cat, double Multiplier);
+	void ChangeRandomProperty(FCatStruct& Cat, const double Multiplier);
 
 	/** Calculates spawn location based on player characters position in world space*/
 	void CalculateSpawnLocations();

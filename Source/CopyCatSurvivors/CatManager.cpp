@@ -25,6 +25,11 @@ void ACatManager::BeginPlay()
 		//set target location
 	}
 	SpawnCats();
+
+	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
+	{
+		TotalWeight += Property.Weight;
+	}
 }
 
 // Called every frame
@@ -181,10 +186,7 @@ void ACatManager::ChangeRandomProperty(FCatStruct& Cat, const double Multiplier)
 			}
 			break;
 		}
-		else
-		{
-			WeightIndex -= Property.Weight;
-		}
+		WeightIndex -= Property.Weight;
 	}
 }
 
