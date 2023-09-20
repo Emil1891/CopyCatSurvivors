@@ -3,6 +3,8 @@
 
 #include "BTService_FindLaser.h"
 
+#include "AIController.h"
+#include "CopyCatSurvivorsPlayerController.h"
 #include "CrazyCatCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -29,8 +31,35 @@ void UBTService_FindLaser::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if(!PlayerPawn)
 	{
-		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerLocation");
+		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget");
 		return;
+	}
+	if (OwnerComp.GetAIOwner() == nullptr)
+	{
+		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget");
+		return;
+	}
+	
+	PlayerCharacter = Cast<ACrazyCatCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!IsValid(PlayerCharacter) )
+	{
+		return;
+	}
+	ensure (PlayerCharacter != nullptr);
+	
+	if (PlayerCharacter->GetController())
+	{
+		ACopyCatSurvivorsPlayerController* OwnerController = Cast<ACopyCatSurvivorsPlayerController>(PlayerCharacter->GetController());
+		if (OwnerController)
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsVector("LaserPointerTarget", OwnerController->LaserPointerDestination);
+		}
+		
+	}
+	else
+	{
+		OwnerComp.GetBlackboardComponent()->ClearValue("LaserPointerTarget");
+
 	}
 	
 }
