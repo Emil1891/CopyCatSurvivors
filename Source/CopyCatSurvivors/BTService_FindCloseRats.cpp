@@ -65,23 +65,20 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 			ARatCharacter* RatCharacter = Cast<ARatCharacter>(Overlap.GetActor());
 			if (RatCharacter && IsValid(RatCharacter))
 			{
+				OwnerComp.GetBlackboardComponent()->SetValueAsVector("ClosestRatLocation", RatCharacter->GetActorLocation());
+				
+				OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", true);
+				break;
 				//TODO: Sätta en bool i bb som säger att vi hittat råttor och en rått-location. Sen - I Pounce task - gör en sfär runt råttan och launch character mot den sålänge cooldown tillåter det
 				//TODO: När cat är nära target point och inget annat händer - spring i cirklar.
 				// TODO: Om cat är ännu närmare rat så ska den gå in i en sekvens av bite + claw.
 			}
-				
-			/*
-			RatCharacter* CoverPoint = Cast<ACoverPoint>(Overlap.GetActor());
-			if(CoverPoint && !CoverPoint->bIsOccupied && IsCoverValid(CoverPoint) && CoverPoint->LastVisitedCharacter != EnemyAICharacter)
-			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject("Cover", CoverPoint);
-				UE_LOG(LogTemp, Warning, TEXT("Cover is set"));
-				CoverPoint->bIsOccupied = true;
-				CoverPoint->LastVisitedCharacter = EnemyAICharacter;
-				return;
-			}
-			*/
 		}
+	}
+	else
+	{
+		OwnerComp.GetBlackboardComponent()->ClearValue("ClosestRatLocation");
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", false);
 	}
 }
 
