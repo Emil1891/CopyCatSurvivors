@@ -28,6 +28,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetHealthPercent() const { return CurrentHealth / InitialHealth; }
 
+	void IncreaseXP(const int XPIncrease);
+
+	UFUNCTION(BlueprintPure)
+	float GetXPPercent() const { return static_cast<float>(CurrentXP) / XPToLevelUp; }
+
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
@@ -70,5 +75,23 @@ private:
 	float GracePeriod = 0.05f;
 
 	// Keeps track of the time that the player last took damage 
-	double LastDamageTime = 0; 
+	double LastDamageTime = 0;
+
+	// XP 
+	
+	// Player's current XP level (not used right now but ill keep for now) 
+	int XPLevel = 0;
+
+	// Current XP in level 
+	int CurrentXP = 0;
+
+	// Set XP to level up to level 1 
+	UPROPERTY(EditAnywhere)
+	int XPToLevelUp = 10; 
+
+	// How much more XP is needed each level (multiplier)
+	UPROPERTY(EditAnywhere)
+	float XPMultiplierEachLevel = 1.2f;
+
+	void LeveledUp(); 
 };

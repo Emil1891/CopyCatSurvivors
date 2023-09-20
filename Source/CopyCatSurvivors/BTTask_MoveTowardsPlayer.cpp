@@ -5,8 +5,8 @@
 #include "AIController.h"
 #include "MapGrid.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 void UBTTask_MoveTowardsPlayer::OnGameplayTaskActivated(UGameplayTask& Task)
 {
@@ -41,25 +41,21 @@ void UBTTask_MoveTowardsPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	
 	// If AI has reached its target, finish task as a success 
 	if(Player->GetActorLocation().Equals(OwnerLoc, SuccessRange))
+	{
+		// Owner->TakeDamage(3, FDamageEvent(), Owner->GetController(), Owner); // only used to test stuff 
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 	
 	// Otherwise move towards player
 	const FVector MoveDir = Grid->GetDirectionBasedOnWorldLocation(OwnerLoc);
 	const FVector NewLocDelta = MoveDir * MoveSpeed * DeltaSeconds;
 	Owner->SetActorLocation(OwnerLoc + NewLocDelta);
-
-	// Rotate towards player 
-	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerLoc, Player->GetActorLocation());
-	LookAtRot.Pitch = 0; // Only want Yaw rotation (Z) so zero out the rest 
-	LookAtRot.Roll = 0; 
-
-	// flip sprite if "looking backwards" (NOTE THIS ASSUMES A SCALE OF ONE IS USED)
-	if(LookAtRot.Yaw > -180 && LookAtRot.Yaw < 0)
-		Owner->SetActorScale3D(FVector(1, -1, 1));
+	
+	// flip sprite if walking "backwards" (NOTE THIS ASSUMES A SCALE OF ONE IS USED)
+	if(MoveDir.Y < 0)
+		Owner->SetActorScale3D(FVector(1, -1, 1)); 
 	else
 		Owner->SetActorScale3D(FVector::One());
-	
-	Owner->SetActorRotation(LookAtRot);
-	
+
 	return FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 }

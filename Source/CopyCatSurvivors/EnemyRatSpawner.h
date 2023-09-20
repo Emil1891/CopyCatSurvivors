@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "EnemyRatSpawner.generated.h"
 
-// TODO: OBJECT POOLING, ARRAY(?) KEEPING RATS AND WHEN RATS ARE KILLED
+// TODO: OBJECT POOLING, ARRAY(?) KEEPING RATS AND WHEN RATS ARE KILLED,
 // TODO: THEY END UP IN THE ARRAY INSTEAD OF BEING DESTROYED 
 
 UCLASS()
@@ -23,6 +23,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+public:
+
+	int GetWave() const { return WaveCount; }
 
 private:
 
@@ -63,4 +67,8 @@ private:
 	UPROPERTY()
 	FVector2D ViewportSize; 
 
+	// How many tries to spawn an enemy until calling it a failure and ending the spawning altogether
+	// Should not be needed by improving the spawning system but time is short 
+	UPROPERTY(EditAnywhere)
+	int MaxSpawnAttempts = 50; 
 };

@@ -25,10 +25,26 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	int MaxHealth = 10;
+	int InitialMaxHealth = 10;
+
+	UPROPERTY(EditAnywhere)
+	int HealthIncreaseEachSpawnWave = 2; 
 
 	int CurrentHealth;
 
-	void KillMe(); 
+	void KillMe();
+
+	void ShowDamageNumberUI(const float DamageAmount) const; 
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AXPDrop> XPDropClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> DamageWidgetClass;
+	
+	UPROPERTY(EditAnywhere)
+	float TimeToRemoveDamageUI = 1.f;
+
+	inline static class AEnemyRatSpawner* Spawner = nullptr; 
 
 };
