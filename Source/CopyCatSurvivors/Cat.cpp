@@ -29,14 +29,21 @@ void ACat::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UpdateDerivedProperties();
 	
 	GetWorldTimerManager().SetTimer(InitializeControllerTimerHandle, this, &ACat::InitializeController, 0.1, false, InitializeControllerDelay);
 }
 
 void ACat::UpdateDerivedProperties()
 {
-	Mass = Properties.Chonkiness + (Properties.NumLegs - 4) + (Properties.NumTails - 1) + Properties.BrainSize/100;
-	//Fyll på med resten av derived properties
+	Mass = Properties.Chonkiness + (Properties.NumLegs - 4) / 4 + (Properties.NumTails - 1) / 4 + Properties.BrainSize/100; //2 by default
+	MoveSpeed = (Properties.NumLegs - Mass) * 100 + 100; //300 by default
+	AttackSpeed = Properties.LungCapacity / 25 + Properties.NumHearts * 2 - Mass; //4 by default
+	BiteDamage = Properties.NumTeeth; //30 by default
+	ClawDamage = Properties.NumLegs * Properties.NumClaws; //20 by default
+	PounceDamage = Mass * 20 + (BiteDamage + ClawDamage) / 2; //65 by default
+	PounceDistance = 300 + Properties.NumTails * 100 - Mass * 50; //300 by default
+	TrackingAccuracy = Properties.BrainSize * Properties.NumEyes; //200 by default
 }
 
 // Called every frame

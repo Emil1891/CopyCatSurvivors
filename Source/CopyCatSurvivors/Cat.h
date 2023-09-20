@@ -61,7 +61,7 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FCatStruct Properties;
 
 	UPROPERTY(EditAnywhere)
