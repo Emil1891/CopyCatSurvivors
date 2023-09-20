@@ -24,7 +24,7 @@ void ACatManager::BeginPlay()
 	{
 		//set target location
 	}
-	SpawnCats();
+	SpawnStartingCats();
 
 	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
 	{
@@ -47,13 +47,15 @@ FCatStruct ACatManager::Copy(FCatStruct CopyCat)
 	return NewCat;
 }
 
-void ACatManager::Mutate(FCatStruct& CatStruct)
+FCatStruct ACatManager::Mutate(FCatStruct CatStruct)
 {
-	ChangeRandomProperty(CatStruct, 3);
-	ChangeRandomProperty(CatStruct, 2);
-	ChangeRandomProperty(CatStruct, 1);
-	ChangeRandomProperty(CatStruct, -1);
-	ChangeRandomProperty(CatStruct, -1);
+	FCatStruct NewCat = CatStruct;
+	ChangeRandomProperty(NewCat, 3);
+	ChangeRandomProperty(NewCat, 2);
+	ChangeRandomProperty(NewCat, 1);
+	ChangeRandomProperty(NewCat, -1);
+	ChangeRandomProperty(NewCat, -1);
+	return NewCat;
 }
 
 FCatStruct ACatManager::Splice(FCatStruct Cat1, FCatStruct Cat2)
@@ -145,6 +147,21 @@ FCatStruct ACatManager::Fuse(FCatStruct Cat1, FCatStruct Cat2)
 	return NewCat;
 }
 
+void ACatManager::SpawnCat(FCatStruct NewCatStruct)
+{
+	CalculateSpawnLocations();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	ACat* NewCat = GetWorld()->SpawnActor<ACat>(CatClass, SpawnLocations[0], FRotator::ZeroRotator, SpawnParams);
+	ensure (NewCat != nullptr);
+
+	NewCat->Properties = NewCatStruct;
+	
+	// create struct with data, set variables in struct, assign pointer in spawned cat to that struct in array and add both cat and struct in collections
+	Cats.Add(NewCat);
+}
+
 void ACatManager::ChangeRandomProperty(FCatStruct& Cat, const double Multiplier)
 {
 	int WeightIndex = rand() % TotalWeight;
@@ -217,7 +234,7 @@ void ACatManager::CalculateSpawnLocations()
 	}
 }
 
-void ACatManager::SpawnCats()
+void ACatManager::SpawnStartingCats()
 {
 	if (!GetWorld()) return;
 	if (NumOfInitialCats != 0)
