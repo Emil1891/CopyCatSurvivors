@@ -42,3 +42,24 @@ void ACrazyCatCharacter::KillMe()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Player Died"))
 }
+
+void ACrazyCatCharacter::LeveledUp()
+{
+	// TODO: ADD ALL LEVEL UP STUFF HERE 
+	
+	XPLevel++; 
+	CurrentXP = 0; // Reset
+	XPToLevelUp *= XPMultiplierEachLevel; // Multiply so more xp is needed next level
+
+	// TODO: Probably freeze game and display level up UI screen 
+}
+
+void ACrazyCatCharacter::IncreaseXP(const int XPIncrease)
+{
+	// add xp 
+	CurrentXP += XPIncrease;
+
+	// see if added xp made player level up 
+	if(CurrentXP >= XPToLevelUp)
+		LeveledUp();
+}

@@ -61,23 +61,32 @@ void AEnemyRatSpawner::SpawnNewWave()
 {
 	const int EnemiesToSpawn = StartEnemyCount + WaveCount * EnemyCountIncreaseEachWave;
 	
-	UE_LOG(LogTemp, Warning, TEXT("Spawning new wave, enemy count: %i"), EnemiesToSpawn)
+	UE_LOG(LogTemp, Warning, TEXT("Spawning new wave, enemies spawning: %i"), EnemiesToSpawn)
 	
 	for(int i = 0; i < EnemiesToSpawn; i++)
 	{
 		FVector SpawnLoc = FVector::Zero();
 		SpawnLoc.Z = SpawnZLoc; 
 
-		// TODO: Improve this, maybe spread the spawns out over frames? 
+		// TODO: Improve this, maybe spread the spawns out over frames?
+		int SpawnAttempts = 0; 
 		do
 		{
+			if(SpawnAttempts++ > MaxSpawnAttempts)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("failed too many spawns"))
+				goto breakpoint; // now this is programming
+			}
+			
 			SpawnLoc.X = FMath::RandRange(MinSpawnArea.X, MaxSpawnArea.X); 
 			SpawnLoc.Y = FMath::RandRange(MinSpawnArea.Y, MaxSpawnArea.Y);
-		} while(!SpawnIsValid(SpawnLoc)); // Generate new spawn point if spawn is not valid 
+		} while(!SpawnIsValid(SpawnLoc) && SpawnAttempts < 100); // Generate new spawn point if spawn is not valid 
 		
 		GetWorld()->SpawnActor<AActor>(RatClass, SpawnLoc, FRotator::ZeroRotator); 
 	}
 
+	breakpoint: 
+	
 	WaveCount++;
 
 	// Set timer for when to spawn a new wave 
