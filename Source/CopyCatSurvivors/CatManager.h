@@ -64,17 +64,26 @@ public:
 	FCatStruct Copy(FCatStruct CopyCat);
 
 	UFUNCTION(BlueprintCallable)
-	void Mutate(FCatStruct& CatStruct);
+	FCatStruct Mutate(FCatStruct CatStruct);
+
+	UFUNCTION(BlueprintCallable)
+	FCatStruct Splice(FCatStruct Cat1, FCatStruct Cat2);
+
+	UFUNCTION(BlueprintCallable)
+	FCatStruct Fuse(FCatStruct Cat1, FCatStruct Cat2);
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnCat(FCatStruct NewCatStruct);
 
 private:
 	int TotalWeight = 0;
-	void ChangeRandomProperty(FCatStruct& Cat, double Multiplier);
+	void ChangeRandomProperty(FCatStruct& Cat, const double Multiplier);
 
 	/** Calculates spawn location based on player characters position in world space*/
 	void CalculateSpawnLocations();
 
 	/** Spawns cat instances*/
-	void SpawnCats();
+	void SpawnStartingCats();
 
 	/** Decides how many cats to spawn*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Spawning, meta=(AllowPrivateAccess = "true"))
