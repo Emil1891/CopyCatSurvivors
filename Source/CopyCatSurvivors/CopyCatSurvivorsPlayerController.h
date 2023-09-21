@@ -50,6 +50,7 @@ public:
 	UInputAction* DashCatAction;
 
 	/** Destination that is target for cat army*/
+	UPROPERTY(BlueprintReadOnly)
 	FVector LaserPointerDestination;
 
 	/** On dash input event*/
@@ -93,6 +94,12 @@ private:
     
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dash, meta=(AllowPrivateAccess = "true"))
 	FColor LaserPointerColor = FColor::Green;
+
+	UPROPERTY()
+	class USpotLightComponent* LaserPointerLight;
+
+	UPROPERTY()
+	USceneComponent* LaserEndComponent; 
 };
 
 

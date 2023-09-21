@@ -10,8 +10,11 @@
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/LineBatchComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ACopyCatSurvivorsPlayerController::ACopyCatSurvivorsPlayerController()
@@ -36,6 +39,9 @@ void ACopyCatSurvivorsPlayerController::BeginPlay()
 	{
 		LaserPointerColor = PlayerCharacter->GetLaserPointerColor();
 		DashCooldownDuration = PlayerCharacter->GetDashCoolDown();
+
+		LaserPointerLight = Cast<USpotLightComponent>(PlayerCharacter->GetComponentByClass(USpotLightComponent::StaticClass()));
+		LaserEndComponent = Cast<USceneComponent>(PlayerCharacter->GetComponentsByTag(USceneComponent::StaticClass(), FName("LaserEndLocation"))[0]); 
 	}
 }
 
@@ -111,6 +117,8 @@ void ACopyCatSurvivorsPlayerController::MoveCatRight(const FInputActionValue& Va
 		
 		// add movement 
 		ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
+
+		
 	}
 }
 
@@ -132,7 +140,12 @@ void ACopyCatSurvivorsPlayerController::DoLaserPointer()
 	}
 
 	//DrawDebugSphere(GetWorld(), LaserPointerDestination, 10.f, 30, LaserPointerColor, false, 0.1, 0, 1);
-	DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation(), LaserPointerDestination, LaserPointerColor, false, 0.1, 0, 1);
+	// DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation(), LaserPointerDestination, LaserPointerColor, false, 0.1, 0, 1);
+	
+	// Rotate light towards the cursor's location 
+	LaserPointerLight->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserPointerLight->GetComponentLocation(), LaserPointerDestination));
+	// Set end location for the laser end component (which is connected to a cable component that is the laser)
+	LaserEndComponent->SetWorldLocation(LaserPointerDestination); 
 }
 
 

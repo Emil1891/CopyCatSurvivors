@@ -35,10 +35,10 @@ float ARatCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
                                 AActor* DamageCauser)
 {
 	const float SuperDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	UE_LOG(LogTemp, Warning, TEXT("You damaged a rat! Damage: %f"), DamageAmount)
-
+	
 	CurrentHealth -= FMath::Min(DamageAmount, CurrentHealth);
+	
+	UE_LOG(LogTemp, Warning, TEXT("You damaged a rat! Health left: %i"), CurrentHealth)
 
 	// Display the damage as a number on screen 
 	ShowDamageNumberUI(DamageAmount);
