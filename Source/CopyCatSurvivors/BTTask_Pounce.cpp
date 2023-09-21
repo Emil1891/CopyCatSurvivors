@@ -46,22 +46,23 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	
-	// Cache the cat character's start location
-	OwnerCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetPawn());
-	if (OwnerCharacter)
-	{
-		StartLocation = OwnerCharacter->GetActorLocation();
-	}
-
-	// Check if value is set - cache the target location (TargetLocation)
-	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("PounceRatLocation"))
-	{
-		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("PounceRatLocation");
-	}
 	
 	// If cat is currently pouncing
 	if (bPouncing)
 	{
+		// Cache the cat character's start location
+		OwnerCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetPawn());
+		if (OwnerCharacter)
+		{
+			StartLocation = OwnerCharacter->GetActorLocation();
+		}
+
+		// Check if value is set - cache the target location (TargetLocation)
+		if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("PounceRatLocation"))
+		{
+			TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("PounceRatLocation");
+		}
+	
 		// if the cooldown timer has expired
 		if (PounceCooldownTimer <= 0.0f)
 		{
@@ -103,9 +104,14 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 			{
 				bPouncing = true;
 			}
+			OwnerComp.GetBlackboardComponent()->ClearValue("PounceRatLocation");
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", false);
+			OwnerComp.GetBlackboardComponent()->ClearValue("bFoundRatsWithinPounceRadius");
 		}
 	}
-	GetWorld()->GetTimerManager().ClearTimer(RetreatTimerHandle);
+
+	
+	//GetWorld()->GetTimerManager().ClearTimer(RetreatTimerHandle);
 }
 
 void UBTTask_Pounce::MakePounceAreaDamage()
@@ -136,7 +142,7 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 			if (RatCharacter && IsValid(RatCharacter))
 			{
 				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Orange, false, .2f);
-				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("Pouncing ")));
+				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("Pouncing ")));
 
 				// maybe apply force/launch the rats?
 				UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->PounceDamage, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
