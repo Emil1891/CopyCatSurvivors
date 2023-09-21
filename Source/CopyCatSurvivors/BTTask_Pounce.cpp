@@ -72,6 +72,8 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 				FVector LaunchVelocity = LaunchDirection * PounceForce; 
 				OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
 				OnPounceAttack();
+				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("launching character for pouncing")));
+
 				//GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, 0.1f, false, RetreatDelay);
 				MakePounceAreaDamage();
 			}
@@ -133,7 +135,7 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 			// if overlap is found, do damage
 			if (RatCharacter && IsValid(RatCharacter))
 			{
-				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
+				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Orange, false, .2f);
 				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("Pouncing ")));
 
 				// maybe apply force/launch the rats?
