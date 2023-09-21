@@ -40,10 +40,11 @@ float ARatCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 
 	CurrentHealth -= FMath::Min(DamageAmount, CurrentHealth);
 
+	// Display the damage as a number on screen 
+	ShowDamageNumberUI(DamageAmount);
+	
 	if(CurrentHealth <= 0)
 		KillMe();
-	else
-		ShowDamageNumberUI(DamageAmount);
 
 	return SuperDamage; 
 }
