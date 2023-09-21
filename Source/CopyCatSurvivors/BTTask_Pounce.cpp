@@ -134,6 +134,8 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 			if (RatCharacter && IsValid(RatCharacter))
 			{
 				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
+				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("Pouncing ")));
+
 				// maybe apply force/launch the rats?
 				UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->PounceDamage, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
 			}
