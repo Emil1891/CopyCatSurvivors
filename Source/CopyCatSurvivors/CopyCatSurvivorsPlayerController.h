@@ -55,6 +55,10 @@ public:
 	/** On dash input event*/
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDashInput();
+
+	/** Bool to enable laser pointer*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bDoLaser = true;
 	
 protected:
 	

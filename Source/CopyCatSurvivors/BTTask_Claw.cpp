@@ -52,6 +52,7 @@ void UBTTask_Claw::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	{
 		OnClawAttack();
 		OwnerCharacter->OnClawAttack();
+		if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Purple, false, .2f);
 		UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->ClawDamage, OwnerCharacter->GetController(), OwnerCharacter, nullptr);
 	}
 
