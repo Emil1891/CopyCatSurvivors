@@ -46,12 +46,12 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 
 	// Make a sphere from cats location as large as defined radius
 	const FVector MyLocation = OwnerCharacter->GetActorLocation();
-	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(OwnerCharacter->PounceDistance); 
+	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(OwnerCharacter->PounceDistance * PounceDistanceMultiplier); 
 	FCollisionObjectQueryParams Params = FCollisionObjectQueryParams();
 	Params.AddObjectTypesToQuery(ECC_Pawn);
 	TArray<FOverlapResult> OverlapResults;
 
-	if (bDebug) DrawDebugSphere(GetWorld(), MyLocation, OwnerCharacter->PounceDistance, 24, FColor::Turquoise, false, .5f);
+	if (bDebug) DrawDebugSphere(GetWorld(), MyLocation, OwnerCharacter->PounceDistance  * PounceDistanceMultiplier, 24, FColor::Turquoise, false, .5f);
 
 	// check if sphere overlaps with any rats
 	bool bOverlaps = GetWorld()->OverlapMultiByObjectType(
@@ -83,6 +83,8 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	{
 		// if no overlaps found, clear values (and reset laser point target if we want)
 		OwnerComp.GetBlackboardComponent()->ClearValue("PounceRatLocation");
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", false);
+
 		OwnerComp.GetBlackboardComponent()->ClearValue("bFoundRatsWithinPounceRadius");
 		
 	}
