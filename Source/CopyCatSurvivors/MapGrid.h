@@ -83,7 +83,6 @@ private:
 
 	GridNode* GetNodeFromArray(const int IndexX, const int IndexY) const;
 
-
 	TArray<GridNode*> GetNeighbours(const GridNode* Node) const;
 
 	int GetIndex(const int IndexX, const int IndexY) const; 

@@ -86,7 +86,7 @@ void Pathfinder::UpdateNodeDirections()
 				if(Grid->bDrawDebugStuff)
 					DrawDebugLine(Grid->GetWorld(), Current->GetWorldCoordinate() + FVector::UpVector * 10,
 					Current->GetWorldCoordinate() + Current->GetDirection() * 20 + FVector::UpVector * 10,
-					FColor::Cyan, false, -1, 0, 5);
+					FColor::Cyan, false, 0.2, 0, 5); 
 			}
 		}
 	}

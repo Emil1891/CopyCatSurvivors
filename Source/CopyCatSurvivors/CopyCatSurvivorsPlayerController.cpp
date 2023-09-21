@@ -152,7 +152,7 @@ void ACopyCatSurvivorsPlayerController::DoLaserPointer()
 void ACopyCatSurvivorsPlayerController::Dash()
 {
 	GetCharacter()->LaunchCharacter(
-		GetPawn()->GetActorForwardVector() * DashStrength,
+		GetPawn()->GetMovementComponent()->Velocity.GetSafeNormal() * DashStrength,
 		false,
 		false
 		);
