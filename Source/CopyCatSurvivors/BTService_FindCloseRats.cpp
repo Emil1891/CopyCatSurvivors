@@ -76,6 +76,12 @@ void UBTService_FindCloseRats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 				
 				if (bDebug)	DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
 			}
+			else
+			{
+				OwnerComp.GetBlackboardComponent()->ClearValue("PounceRatLocation");
+				OwnerComp.GetBlackboardComponent()->SetValueAsBool("bFoundRatsWithinPounceRadius", false);
+				OwnerComp.GetBlackboardComponent()->ClearValue("bFoundRatsWithinPounceRadius");
+			}
 		}
 	}
 	
