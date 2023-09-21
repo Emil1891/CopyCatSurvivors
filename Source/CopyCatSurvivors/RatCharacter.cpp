@@ -21,11 +21,11 @@ void ARatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(!Spawner)
+	if(!Spawner || Spawner->GetWave() == 0)
 		Spawner = Cast<AEnemyRatSpawner>(UGameplayStatics::GetActorOfClass(this, AEnemyRatSpawner::StaticClass())); 
 
 	// set health based on wave, increasing it with time
-	if(Spawner)
+	if(Spawner) 
 		CurrentHealth = InitialMaxHealth + HealthIncreaseEachSpawnWave * Spawner->GetWave();
 	else // Should not get here but might when debugging in test maps without a spawner 
 		CurrentHealth = InitialMaxHealth; 
