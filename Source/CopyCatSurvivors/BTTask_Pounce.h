@@ -48,7 +48,7 @@ private:
 
 	/** Radius for radial pounce damage*/
 	UPROPERTY(EditAnywhere)
-	float PounceDamageRadius = 50.f;
+	float PounceDamageRadius = 100.f;
 
 	/** Speed when returning to start position*/
 	UPROPERTY(EditAnywhere)
@@ -68,7 +68,7 @@ private:
 	FTimerHandle RetreatTimerHandle;
 
 	UPROPERTY(EditAnywhere)
-	float RetreatDelay = 0.3f;
+	float RetreatDelay = 1.f;
 
 	void MoveCharacterBack();
 

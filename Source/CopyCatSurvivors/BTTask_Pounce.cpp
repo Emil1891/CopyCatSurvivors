@@ -54,9 +54,9 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	}
 
 	// Check if value is set - cache the target location (TargetLocation)
-	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("ClosestRatLocation"))
+	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("PounceRatLocation"))
 	{
-		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("ClosestRatLocation");
+		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("PounceRatLocation");
 	}
 	
 	// If cat is currently pouncing
@@ -69,13 +69,11 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 			if (OwnerCharacter)
 			{
 				FVector LaunchDirection = (TargetLocation  - StartLocation).GetSafeNormal();
-				FVector LaunchVelocity = LaunchDirection * PounceForce; //should be set with cats own attackspeed osv.
+				FVector LaunchVelocity = LaunchDirection * PounceForce; 
 				OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
 				OnPounceAttack();
-				// maybetimer to back character away? aka launch it back?
-				GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, -1.f, false, RetreatDelay);
+				//GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, 0.1f, false, RetreatDelay);
 				MakePounceAreaDamage();
-				// should set something in bb/catchar that pouncing attack is going on to not fuck with claw attack
 			}
 
 			// Reset pounce flag and reset the cooldown timer for the next pounce
@@ -90,11 +88,9 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	else
 	{
 		// If not pouncing, move the character back to the start location
-		//OwnerCharacter = Cast<ACrazyCatCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 		if (OwnerCharacter)
 		{
 			FVector MoveDirection = (StartLocation - OwnerCharacter->GetActorLocation()).GetSafeNormal();
-			//DrawDebugSphere(GetWorld(), StartLocation, 30.f, 30, FColor::Black, false, 0.3f, 0, 0);
 			// should be replaced with characters move speed
 			FVector MoveVelocity = MoveDirection * ReturnSpeed;
 			OwnerCharacter->AddMovementInput(MoveVelocity , 1.0f);
@@ -107,23 +103,24 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 			}
 		}
 	}
+	GetWorld()->GetTimerManager().ClearTimer(RetreatTimerHandle);
 }
 
 void UBTTask_Pounce::MakePounceAreaDamage()
 {
 	// Make a sphere from cats location as large as defined radius
-	const FVector MyLocation = OwnerCharacter->GetActorLocation();
+	const FVector CenterLocation = TargetLocation;
 	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(PounceDamageRadius); 
 	FCollisionObjectQueryParams Params = FCollisionObjectQueryParams();
 	Params.AddObjectTypesToQuery(ECC_Pawn);
 	TArray<FOverlapResult> OverlapResults;
 
-	if (bDebug) DrawDebugSphere(GetWorld(), MyLocation, PounceDamageRadius, 24, FColor::Red, false, .5f);
+	if (bDebug) DrawDebugSphere(GetWorld(), CenterLocation, PounceDamageRadius, 24, FColor::Red, false, .5f);
 
 	// check if sphere overlaps with any rats
 	bool bOverlaps = GetWorld()->OverlapMultiByObjectType(
 		OverlapResults,
-		MyLocation,
+		CenterLocation,
 		FQuat::Identity,
 		Params,
 		CheckSphereShape);
@@ -138,7 +135,7 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 			{
 				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
 				// maybe apply force/launch the rats?
-				UGameplayStatics::ApplyDamage(RatCharacter, 50.f, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
+				UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->PounceDamage, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
 			}
 		}
 	}
@@ -146,9 +143,9 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 
 void UBTTask_Pounce::MoveCharacterBack()
 {
+	UE_LOG(LogTemp, Warning, TEXT("REtreating"));
 	FVector LaunchDirection = (StartLocation - TargetLocation).GetSafeNormal();
 	FVector LaunchVelocity = LaunchDirection * PounceForce;
-	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("Retreating")));
 	OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
 }
 

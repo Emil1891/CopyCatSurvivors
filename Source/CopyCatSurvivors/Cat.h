@@ -55,6 +55,9 @@ public:
 	ACat();
 	ACat(const FCatStruct& CatStruct);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnClawAttack();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
