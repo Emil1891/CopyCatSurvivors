@@ -51,7 +51,8 @@ void ACrazyCatCharacter::LeveledUp()
 	CurrentXP = 0; // Reset
 	XPToLevelUp *= XPMultiplierEachLevel; // Multiply so more xp is needed next level
 
-	// TODO: Probably freeze game and display level up UI screen 
+	// TODO: Probably freeze game and display level up UI screen
+	LevelUpEvent();
 }
 
 void ACrazyCatCharacter::IncreaseXP(const int XPIncrease)

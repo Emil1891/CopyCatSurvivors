@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetXPPercent() const { return static_cast<float>(CurrentXP) / XPToLevelUp; }
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void LevelUpEvent();
+
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))

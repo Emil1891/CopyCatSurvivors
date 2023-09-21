@@ -43,8 +43,11 @@ void ACopyCatSurvivorsPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	DoLaserPointer();
-    
+	if (bDoLaser)
+	{
+		DoLaserPointer();
+
+	}
 }
 
 

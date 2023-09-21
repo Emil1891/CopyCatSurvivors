@@ -36,4 +36,7 @@ public:
 	ACat* OwnerCharacter;
 
 	FVector OwnerLocation;
+
+	UPROPERTY(EditAnywhere)
+	bool bDebug = false;
 };

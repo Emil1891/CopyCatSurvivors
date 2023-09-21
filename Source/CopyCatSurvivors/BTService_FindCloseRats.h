@@ -36,9 +36,9 @@ private:
 	UPROPERTY()
 	ACrazyCatCharacter* PlayerCharacter;
 
-	/** Radius around character location to check for rats*/
+	/** Radius multiplier to multiply radius around character location to check for rats (multiplier for pounce distance in cat)*/
 	UPROPERTY(EditAnywhere)
-	float FindRatsRadius = 100.f;
+	float PounceDistanceMultiplier = 2.f;
 
 	UPROPERTY(EditAnywhere)
 	bool bDebug = false;
