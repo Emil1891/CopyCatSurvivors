@@ -27,8 +27,7 @@ void AEnemyRatSpawner::BeginPlay()
 		return; 
 	}
 
-	const FVector GridLocation = Grid->GetActorLocation(); 
-	SpawnZLoc = GridLocation.Z;
+	SpawnZLoc = SpawnHeight;
 
 	// Set minimum coordinates where spawns are valid 
 	MinSpawnArea = Grid->GetGridBottomLeftLocation();
