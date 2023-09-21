@@ -70,5 +70,8 @@ private:
 	// How many tries to spawn an enemy until calling it a failure and ending the spawning altogether
 	// Should not be needed by improving the spawning system but time is short 
 	UPROPERTY(EditAnywhere)
-	int MaxSpawnAttempts = 50; 
+	int MaxSpawnAttempts = 50;
+
+	UPROPERTY(EditAnywhere)
+	float SpawnHeight = 75.f; 
 };
