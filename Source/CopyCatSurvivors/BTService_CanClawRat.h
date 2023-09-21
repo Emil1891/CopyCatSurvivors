@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
-#include "BTService_FindCloseRats.generated.h"
+#include "BTService_CanClawRat.generated.h"
 
-class ACrazyCatCharacter;
+class ACat;
 /**
  * 
  */
 UCLASS()
-class COPYCATSURVIVORS_API UBTService_FindCloseRats : public UBTService_BlackboardBase
+class COPYCATSURVIVORS_API UBTService_CanClawRat : public UBTService_BlackboardBase
 {
 	GENERATED_BODY()
 
+	
 public: /** Constructor*/
-	UBTService_FindCloseRats();
+	UBTService_CanClawRat();
 
 	/** I have no idea when this is called but it is needed */
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
@@ -25,23 +26,20 @@ public: /** Constructor*/
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnCanPounceRatEvent();
+	void OnCanClawRatEvent();
 	
 protected:
-	/** Tick node is called every tick service is in progress. Gets player character and sets blackboard value to laser point target in player controller*/
+	/** Tick node is called every tick service is in progress*/
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
-private:
-
 	UPROPERTY()
-	ACrazyCatCharacter* PlayerCharacter;
-
-	/** Radius multiplier to multiply radius around character location to check for rats (multiplier for pounce distance in cat)*/
-	UPROPERTY(EditAnywhere)
-	float PounceDistanceMultiplier = 2.f;
+	ACat* OwnerCharacter;
 
 	UPROPERTY(EditAnywhere)
 	bool bDebug = false;
-	
+
+	UPROPERTY(EditAnywhere)
+	float ClawDistance = 50.f;
+
 	
 };

@@ -4,9 +4,13 @@
 #include "BTTask_Pounce.h"
 
 #include "AIController.h"
+#include "Cat.h"
 #include "CrazyCatCharacter.h"
+#include "RatCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 
 UBTTask_Pounce::UBTTask_Pounce()
@@ -14,6 +18,7 @@ UBTTask_Pounce::UBTTask_Pounce()
 	NodeName = TEXT("Pounce");
 	bPouncing = false;
 }
+
 
 void UBTTask_Pounce::OnGameplayTaskActivated(UGameplayTask& Task)
 {
@@ -23,32 +28,13 @@ void UBTTask_Pounce::OnGameplayTaskActivated(UGameplayTask& Task)
 EBTNodeResult::Type UBTTask_Pounce::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-
-	//TODO: Sätta en bool i bb som säger att vi hittat råttor och en rått-location. Sen - I Pounce task - gör en sfär runt råttan och launch character mot den sålänge cooldown tillåter det
-	//TODO: När cat är nära target point och inget annat händer - spring i cirklar.
-	// TODO: Om cat är ännu närmare rat så ska den gå in i en sekvens av bite + claw.
-
-	// Cache the cat character's start location
-	ACharacter* OwnerCharacter = Cast<ACharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (OwnerCharacter)
-	{
-		StartLocation = OwnerCharacter->GetActorLocation();
-	}
-
-	// Check if value is set - cache the target location (TargetLocation)
-	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("ClosestRatLocation"))
-	{
-		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("ClosestRatLocation");
-	}
-
+	
 	// Set the cooldown timer and indicate that the cat is currently pouncing
 	if (!bPouncing)
 	{
 		PounceCooldownTimer = PounceCooldownTime;
 		bPouncing = true;
 	}
-
-	
 	
 	// code below makes it so TickTask is called 
 	bNotifyTick = 1;
@@ -61,16 +47,16 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 
 	
 	// Cache the cat character's start location
-	ACharacter* OwnerCharacter = Cast<ACharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	OwnerCharacter = Cast<ACat>(OwnerComp.GetAIOwner()->GetPawn());
 	if (OwnerCharacter)
 	{
 		StartLocation = OwnerCharacter->GetActorLocation();
 	}
 
 	// Check if value is set - cache the target location (TargetLocation)
-	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("ClosestRatLocation"))
+	if (OwnerComp.GetBlackboardComponent()->IsVectorValueSet("PounceRatLocation"))
 	{
-		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("ClosestRatLocation");
+		TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector("PounceRatLocation");
 	}
 	
 	// If cat is currently pouncing
@@ -80,14 +66,14 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 		if (PounceCooldownTimer <= 0.0f)
 		{
 			// Launch cat towards the target location.
-			OwnerCharacter = Cast<ACharacter>(OwnerComp.GetAIOwner()->GetPawn());
 			if (OwnerCharacter)
 			{
 				FVector LaunchDirection = (TargetLocation  - StartLocation).GetSafeNormal();
-				FVector LaunchVelocity = LaunchDirection * PounceForce;
-				GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("Pouncing")));
-				DrawDebugLine(GetWorld(),TargetLocation, StartLocation + LaunchVelocity, FColor::Purple, false, 0.3f, 0, 0 );
+				FVector LaunchVelocity = LaunchDirection * PounceForce; 
 				OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
+				OnPounceAttack();
+				//GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, 0.1f, false, RetreatDelay);
+				MakePounceAreaDamage();
 			}
 
 			// Reset pounce flag and reset the cooldown timer for the next pounce
@@ -102,11 +88,9 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	else
 	{
 		// If not pouncing, move the character back to the start location
-		OwnerCharacter = Cast<ACrazyCatCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 		if (OwnerCharacter)
 		{
 			FVector MoveDirection = (StartLocation - OwnerCharacter->GetActorLocation()).GetSafeNormal();
-			//DrawDebugSphere(GetWorld(), StartLocation, 30.f, 30, FColor::Black, false, 0.3f, 0, 0);
 			// should be replaced with characters move speed
 			FVector MoveVelocity = MoveDirection * ReturnSpeed;
 			OwnerCharacter->AddMovementInput(MoveVelocity , 1.0f);
@@ -119,7 +103,54 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 			}
 		}
 	}
+	GetWorld()->GetTimerManager().ClearTimer(RetreatTimerHandle);
 }
+
+void UBTTask_Pounce::MakePounceAreaDamage()
+{
+	// Make a sphere from cats location as large as defined radius
+	const FVector CenterLocation = TargetLocation;
+	const FCollisionShape CheckSphereShape = FCollisionShape::MakeSphere(PounceDamageRadius); 
+	FCollisionObjectQueryParams Params = FCollisionObjectQueryParams();
+	Params.AddObjectTypesToQuery(ECC_Pawn);
+	TArray<FOverlapResult> OverlapResults;
+
+	if (bDebug) DrawDebugSphere(GetWorld(), CenterLocation, PounceDamageRadius, 24, FColor::Red, false, .5f);
+
+	// check if sphere overlaps with any rats
+	bool bOverlaps = GetWorld()->OverlapMultiByObjectType(
+		OverlapResults,
+		CenterLocation,
+		FQuat::Identity,
+		Params,
+		CheckSphereShape);
+	
+	if(bOverlaps)
+	{
+		for(FOverlapResult Overlap : OverlapResults)
+		{
+			ARatCharacter* RatCharacter = Cast<ARatCharacter>(Overlap.GetActor());
+			// if overlap is found, do damage
+			if (RatCharacter && IsValid(RatCharacter))
+			{
+				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Green, false, .2f);
+				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,200,FColor::Green,FString::Printf(TEXT("Pouncing ")));
+
+				// maybe apply force/launch the rats?
+				UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->PounceDamage, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
+			}
+		}
+	}
+}
+
+void UBTTask_Pounce::MoveCharacterBack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("REtreating"));
+	FVector LaunchDirection = (StartLocation - TargetLocation).GetSafeNormal();
+	FVector LaunchVelocity = LaunchDirection * PounceForce;
+	OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
+}
+
 
 
 
