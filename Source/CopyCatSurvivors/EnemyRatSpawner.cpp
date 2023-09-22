@@ -53,7 +53,9 @@ void AEnemyRatSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this); 
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+	ARatCharacter::Spawner = nullptr; 
 }
 
 void AEnemyRatSpawner::SpawnNewWave()
