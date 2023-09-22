@@ -57,6 +57,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<ACat*> Cats;
 
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FString> Names;
+
 	UPROPERTY(EditAnywhere)
 	TArray<FWeightedAndValuedProperty> WeightedPropertiesArray;
 
@@ -99,7 +102,7 @@ private:
 	FVector SpawnLocation = FVector::ZeroVector;
 
 	/** Distance between cats spawning location*/
-	float DistanceBetweenCats = 50.f;
+	float DistanceBetweenCats = 100.f;
 
 	/** List of spawn location*/
 	TArray<FVector> SpawnLocations = TArray<FVector>();
