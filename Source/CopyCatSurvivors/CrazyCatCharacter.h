@@ -30,8 +30,13 @@ public:
 
 	void IncreaseXP(const int XPIncrease);
 
+	// Returns percent to next level up 
 	UFUNCTION(BlueprintPure)
 	float GetXPPercent() const { return static_cast<float>(CurrentXP) / XPToLevelUp; }
+
+	// Returns the current XP level 
+	UFUNCTION(BlueprintPure)
+	float GetXPLevel() const { return XPLevel; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void LevelUpEvent();
