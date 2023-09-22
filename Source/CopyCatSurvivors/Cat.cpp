@@ -65,7 +65,7 @@ void ACat::UpdateDerivedProperties()
 	AttackSpeed = Properties.LungCapacity / 25 + Properties.NumHearts * 2 - Mass; //4 by default
 	BiteDamage = Properties.NumTeeth; //30 by default
 	ClawDamage = Properties.NumLegs * Properties.NumClaws; //20 by default
-	PounceDamage = Mass * 20 + (BiteDamage + ClawDamage) / 2; //65 by default
+	PounceDamage = Mass * 10 + BiteDamage; //50 by default
 	PounceDistance = 300 + Properties.NumTails * 100 - Mass * 50; //300 by default
 	TrackingAccuracy = Properties.BrainSize * Properties.NumEyes; //200 by default
 }
