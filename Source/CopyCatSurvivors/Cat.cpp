@@ -71,3 +71,16 @@ void ACat::InitializeController()
 	}
 }
 
+FString ACat::GetCatName() const
+{
+	FString CompleteName = Properties.Name + " ";
+	if(Properties.Iteration > 1)
+	{
+		for (int i = 0; i < Properties.Iteration; i++)
+		{
+			CompleteName += "I";
+		}
+	}
+	return CompleteName;
+}
+
