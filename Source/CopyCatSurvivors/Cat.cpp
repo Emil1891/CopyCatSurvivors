@@ -3,6 +3,8 @@
 
 #include "Cat.h"
 
+#include "PaperFlipbookComponent.h"
+#include "PaperFlipbook.h"
 #include "CatBaseAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -32,6 +34,28 @@ void ACat::BeginPlay()
 	UpdateDerivedProperties();
 	
 	GetWorldTimerManager().SetTimer(InitializeControllerTimerHandle, this, &ACat::InitializeController, 0.1, false, InitializeControllerDelay);
+
+	GetWorldTimerManager().SetTimerForNextTick(this, &ACat::SetFlipBook); 
+}
+
+void ACat::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearAllTimersForObject(this); 
+}
+
+void ACat::SetFlipBook()
+{
+	FlipbookComponent = Cast<UPaperFlipbookComponent>(GetComponentByClass(UPaperFlipbookComponent::StaticClass())); 
+
+	for(const auto [Name, FlipBook] : FlipBookMap)
+	{
+		if(GetCatName().Contains(Name))
+			FlipbookComponent->SetFlipbook(FlipBook); 
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Cat name: %s"), *GetCatName())
 }
 
 void ACat::UpdateDerivedProperties()
