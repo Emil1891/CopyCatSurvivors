@@ -64,6 +64,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnClawAttack();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPounceAttack();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

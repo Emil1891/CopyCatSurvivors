@@ -73,6 +73,7 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 				FVector LaunchVelocity = LaunchDirection * PounceForce; 
 				OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
 				OnPounceAttack();
+				OwnerCharacter->OnPounceAttack();
 				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("launching character for pouncing")));
 
 				//GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, 0.1f, false, RetreatDelay);
