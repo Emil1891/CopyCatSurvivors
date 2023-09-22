@@ -5,6 +5,7 @@
 #include "Cat.h"
 #include "CrazyCatCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetArrayLibrary.h"
 
 // Sets default values
 ACatManager::ACatManager()
@@ -12,6 +13,8 @@ ACatManager::ACatManager()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Cats = TArray<ACat*>();
+	Names = TArray<FString>();
+	Names.Append({"Jonathan", "Tabby", "Waffles", "Edgar", "Lucky", "Basil", "Stripey", "O'Malley", "Cheji"});
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +28,11 @@ void ACatManager::BeginPlay()
 		//set target location
 	}
 	SpawnStartingCats();
+
+	for (ACat* Cat : Cats)
+	{
+		Cat->Properties.Name = Names.Pop();
+	}
 
 	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
 	{
