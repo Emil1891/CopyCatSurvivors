@@ -29,14 +29,17 @@ void ACatManager::BeginPlay()
 	}
 	SpawnStartingCats();
 
-	for (ACat* Cat : Cats)
-	{
-		Cat->Properties.Name = Names.Pop();
-	}
-
 	for(const FWeightedAndValuedProperty Property : WeightedPropertiesArray)
 	{
 		TotalWeight += Property.Weight;
+	}
+
+	for (ACat* Cat : Cats)
+	{
+		Cat->Properties.Name = Names.Pop();
+		ChangeRandomProperty(Cat->Properties, 1);
+		ChangeRandomProperty(Cat->Properties, 1);
+		ChangeRandomProperty(Cat->Properties, 1);
 	}
 }
 
@@ -52,6 +55,7 @@ FCatStruct ACatManager::Copy(FCatStruct CopyCat)
 	ChangeRandomProperty(NewCat, 2);
 	ChangeRandomProperty(NewCat, 1);
 	ChangeRandomProperty(NewCat, -1);
+	NewCat.Iteration = CalcCatIteration(NewCat);
 	return NewCat;
 }
 
@@ -105,6 +109,7 @@ FCatStruct ACatManager::Splice(FCatStruct Cat1, FCatStruct Cat2)
 		}
 		break;
 	}
+	NewCat.Name = Names.Pop();
 	return NewCat;
 }
 
@@ -152,6 +157,8 @@ FCatStruct ACatManager::Fuse(FCatStruct Cat1, FCatStruct Cat2)
 	ChangeRandomProperty(NewCat, 1);
 	ChangeRandomProperty(NewCat, -1);
 	ChangeRandomProperty(NewCat, -1);
+	NewCat.Name = Cat1.Name + "-" + Cat2.Name;
+	NewCat.Iteration = CalcCatIteration(NewCat);
 	return NewCat;
 }
 
@@ -261,4 +268,17 @@ void ACatManager::SpawnStartingCats()
 			Cats.Add(NewCat);
 		}
 	}
+}
+
+int ACatManager::CalcCatIteration(FCatStruct CatStruct)
+{
+	int Iteration = 1;
+	for (const ACat* Cat : Cats)
+	{
+		if(CatStruct.Name.Equals(Cat->Properties.Name))
+		{
+			Iteration++;
+		}
+	}
+	return Iteration;
 }
