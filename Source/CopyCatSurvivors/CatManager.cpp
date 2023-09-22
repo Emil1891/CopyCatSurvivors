@@ -15,6 +15,7 @@ ACatManager::ACatManager()
 	Cats = TArray<ACat*>();
 	Names = TArray<FString>();
 	Names.Append({"Jonathan", "Tabby", "Waffles", "Edgar", "Lucky", "Basil", "Stripey", "O'Malley", "Cheji"});
+	Flipbooks = TArray<USceneComponent*>();
 }
 
 // Called when the game starts or when spawned

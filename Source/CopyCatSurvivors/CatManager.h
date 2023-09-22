@@ -9,6 +9,7 @@
 class ACrazyCatCharacter;
 struct FCatStruct;
 class ACat;
+class UPaperFlipbookComponent;
 
 UENUM()
 enum PropertyType
