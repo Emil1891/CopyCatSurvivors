@@ -71,6 +71,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -123,4 +125,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FString GetCatName() const;
+
+	UPROPERTY(EditAnywhere)
+	TMap<FString, class UPaperFlipbook*> FlipBookMap;
+
+	UPROPERTY()
+	class UPaperFlipbookComponent* FlipbookComponent;
+
+	void SetFlipBook(); 
 };
