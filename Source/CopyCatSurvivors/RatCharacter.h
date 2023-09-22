@@ -23,6 +23,9 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	// Need access in RatSpawner
+	inline static class AEnemyRatSpawner* Spawner = nullptr;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	int InitialMaxHealth = 10;
@@ -44,7 +47,4 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	float TimeToRemoveDamageUI = 1.f;
-
-	inline static class AEnemyRatSpawner* Spawner = nullptr; 
-
 };

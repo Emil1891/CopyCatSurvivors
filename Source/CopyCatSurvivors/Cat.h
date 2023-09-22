@@ -14,7 +14,7 @@ struct FCatStruct
 	GENERATED_BODY()
 	FCatStruct()
 	{
-		Iteration = 0;
+		Iteration = 1;
 		NumClaws = 5;
 		NumLegs = 4;
 		NumTeeth = 30;
@@ -27,7 +27,7 @@ struct FCatStruct
 		Name = "Bob";
 	}
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Iteration = 0;
+	int Iteration = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	double NumClaws = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -120,4 +120,7 @@ public:
 
 	FTimerHandle InitializeControllerTimerHandle;
 	float InitializeControllerDelay = 1.f;
+
+	UFUNCTION(BlueprintPure)
+	FString GetCatName() const;
 };
