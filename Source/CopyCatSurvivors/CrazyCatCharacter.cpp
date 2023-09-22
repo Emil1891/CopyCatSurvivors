@@ -64,4 +64,6 @@ void ACrazyCatCharacter::IncreaseXP(const int XPIncrease)
 	// see if added xp made player level up 
 	if(CurrentXP >= XPToLevelUp)
 		LeveledUp();
+	else // if not, then trigger event that signals increased xp 
+		OnIncreasedXP(); 
 }
