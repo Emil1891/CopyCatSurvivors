@@ -129,7 +129,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TMap<FString, class UPaperFlipbook*> FlipBookMap;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	class UPaperFlipbookComponent* FlipbookComponent;
 
 	void SetFlipBook(); 

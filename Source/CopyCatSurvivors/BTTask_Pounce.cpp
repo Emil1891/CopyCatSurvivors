@@ -73,7 +73,7 @@ void UBTTask_Pounce::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 				FVector LaunchVelocity = LaunchDirection * PounceForce; 
 				OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
 				OnPounceAttack();
-				OwnerCharacter->OnPounceAttack();
+				//OwnerCharacter->OnPounceAttack();
 				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("launching character for pouncing")));
 
 				//GetWorld()->GetTimerManager().SetTimer(RetreatTimerHandle, this, &UBTTask_Pounce::MoveCharacterBack, 0.1f, false, RetreatDelay);
@@ -144,7 +144,7 @@ void UBTTask_Pounce::MakePounceAreaDamage()
 			{
 				if (bDebug)DrawDebugSphere(GetWorld(), RatCharacter->GetActorLocation(), 30.f, 24, FColor::Orange, false, .2f);
 				if (bDebug)GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,FString::Printf(TEXT("Pouncing ")));
-
+				OwnerCharacter->OnPounceAttack();
 				// maybe apply force/launch the rats?
 				UGameplayStatics::ApplyDamage(RatCharacter, OwnerCharacter->PounceDamage, OwnerCharacter->GetController(), OwnerCharacter,nullptr);
 			}
