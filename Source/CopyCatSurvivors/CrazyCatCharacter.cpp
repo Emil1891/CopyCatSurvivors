@@ -40,6 +40,7 @@ float ACrazyCatCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 void ACrazyCatCharacter::KillMe()
 {
+	OnKillMeEvent();
 	UE_LOG(LogTemp, Warning, TEXT("Player Died"))
 }
 

@@ -106,6 +106,8 @@ private:
 
 	/** List of spawn location*/
 	TArray<FVector> SpawnLocations = TArray<FVector>();
+
+	int CalcCatIteration(FCatStruct CatStruct);
 	
 };
 

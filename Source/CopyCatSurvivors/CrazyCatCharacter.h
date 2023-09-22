@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void LevelUpEvent();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnKillMeEvent();
+
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=MechanicalProperties, meta=(AllowPrivateAccess = "true"))
