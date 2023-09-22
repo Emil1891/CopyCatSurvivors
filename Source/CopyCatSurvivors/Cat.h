@@ -14,6 +14,7 @@ struct FCatStruct
 	GENERATED_BODY()
 	FCatStruct()
 	{
+		Iteration = 0;
 		NumClaws = 5;
 		NumLegs = 4;
 		NumTeeth = 30;
@@ -23,7 +24,10 @@ struct FCatStruct
 		Chonkiness = 1;
 		BrainSize = 100;
 		LungCapacity = 100;
+		Name = "Bob";
 	}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Iteration = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	double NumClaws = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -42,6 +46,8 @@ struct FCatStruct
 	double BrainSize = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	double LungCapacity = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Name = "Bob";
 	
 };
 
@@ -57,6 +63,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnClawAttack();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPounceAttack();
 
 protected:
 	// Called when the game starts or when spawned
