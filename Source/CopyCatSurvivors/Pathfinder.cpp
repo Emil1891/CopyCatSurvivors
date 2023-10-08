@@ -70,7 +70,7 @@ void Pathfinder::UpdateNodeDirections()
 			// If path to node is cheaper than its current cost 
 			if(NeighbourNewCost < NeighbourNode->GetCost())
 			{
-				// Add node to be visited if has not already been, since its neighbours need to be checked if they
+				// Add node to be visited, since its neighbours need to be checked if they
 				// also have a cheaper path through this node 
 				ToBeVisited.Add(NeighbourNode);
 
