@@ -39,9 +39,8 @@ void Pathfinder::UpdateNodeDirections()
 	GridNode* TargetNode = Grid->GetNodeFromWorldLocation(PlayerPos);
 	TargetNode->SetCost(0);
 
-	// Better data structures can probably be used here 
-	TArray<GridNode*> ToBeVisited; // Holds node that should be visited (LinkedList instead? needs fast removal at start)
-	TSet<GridNode*> Visited; 
+	// Better data structure can probably be used here 
+	TArray<GridNode*> ToBeVisited; // Holds node that should be visited (Queue instead? needs fast removal at start)
 
 	ToBeVisited.Add(TargetNode);
 
@@ -50,7 +49,6 @@ void Pathfinder::UpdateNodeDirections()
 		// Set current to the first item in the array, then remove it 
 		GridNode* Current = ToBeVisited[0];
 		ToBeVisited.RemoveAt(0);
-		Visited.Add(Current); // and add to visited 
 
 		// For each neighbouring node 
 		for(auto NeighbourNode : Grid->GetNeighbours(Current))
@@ -72,9 +70,9 @@ void Pathfinder::UpdateNodeDirections()
 			// If path to node is cheaper than its current cost 
 			if(NeighbourNewCost < NeighbourNode->GetCost())
 			{
-				// Add node to be visited if has not already been 
-				if(!Visited.Contains(NeighbourNode))
-					ToBeVisited.Add(NeighbourNode);
+				// Add node to be visited if has not already been, since its neighbours need to be checked if they
+				// also have a cheaper path through this node 
+				ToBeVisited.Add(NeighbourNode);
 
 				// Update cost 
 				NeighbourNode->SetCost(NeighbourNewCost);
