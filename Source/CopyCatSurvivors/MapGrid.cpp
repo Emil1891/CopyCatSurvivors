@@ -41,22 +41,11 @@ void AMapGrid::Tick(float DeltaSeconds)
 
 	// TODO: REMOVE THIS, ONLY USED FOR MEASURING PERFORMANCE (not the function call) 
 	// FDateTime StartTime = FDateTime::UtcNow();
-	Pathfind->UpdateNodeDirections();
-	// const float TimeElapsedInMs = (FDateTime::UtcNow() - StartTime).GetTotalMilliseconds();
-	// UE_LOG(LogTemp, Display, TEXT("%f ms each tick to update map"), TimeElapsedInMs)
-
-	// DEBUGGING BELOW SHOWING THE NODE THAT THE PLAYER IS CURRENTLY IN
-
-	if(!bDrawDebugStuff)
-		return; 
 	
-	auto PlayerNode = GetNodeFromWorldLocation(UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation()); 
-	DrawDebugSphere(GetWorld(), PlayerNode->GetWorldCoordinate(), NodeRadius, 10, FColor::Cyan);
-
-	// THEN DISPLAYING ITS NEIGHBOURS 
-	for(auto N : GetNeighbours(PlayerNode))
-		if(N->IsWalkable()) // if it's walkable 
-			DrawDebugSphere(GetWorld(), N->GetWorldCoordinate(), NodeRadius, 10, FColor::Purple);
+	Pathfind->UpdateNodeDirections();
+	
+	// const float TimeElapsedInMs = (FDateTime::UtcNow() - StartTime).GetTotalMilliseconds();
+	// UE_LOG(LogTemp, Display, TEXT("%f ms each tick to update map"), TimeElapsedInMs) 
 }
 
 void AMapGrid::CreateGrid()

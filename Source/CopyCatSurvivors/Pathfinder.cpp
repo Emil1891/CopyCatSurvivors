@@ -28,8 +28,9 @@ void Pathfinder::UpdateNodeDirections()
 	const FVector PlayerPos = Player->GetActorLocation(); 
 	GridNode* PlayerNode = Grid->GetNodeFromWorldLocation(PlayerPos);
 
-	// If player has not moved (standing in same node), no need to update the flow field 
-	if(PlayerNode == OldPlayerNode)
+	// If player has not moved (standing in same node), no need to update the flow field. bool check to see if debugging
+	// should be drawn since this optimization otherwise prevents the grid's directions from being drawn 
+	if(!Grid->bDrawDebugStuff && PlayerNode == OldPlayerNode)
 		return;
 
 	OldPlayerNode = PlayerNode; 
@@ -79,16 +80,25 @@ void Pathfinder::UpdateNodeDirections()
 
 				// Set direction to Current node 
 				NeighbourNode->SetDirection(Current);
-
-				// DEBUGGING DISPLAYING DIRECTION
-				if(Grid->bDrawDebugStuff)
-					DrawDebugLine(Grid->GetWorld(), Current->GetWorldCoordinate() + FVector::UpVector * 10,
-					Current->GetWorldCoordinate() + Current->GetDirection() * 20 + FVector::UpVector * 10,
-					FColor::Cyan, false, 0.2, 0, 5); 
 			}
 		}
 	}
-	bHasSetDirInUnwalkableNodes = true; // set to true so it is only checked/set once 
+	bHasSetDirInUnwalkableNodes = true; // set to true so it is only checked/set once
+
+	if(!Grid->bDrawDebugStuff)
+		return; 
+	
+	// DEBUGGING DISPLAYING DIRECTION
+	for(int x = 0; x < Grid->GridArrayLengthX; x++)
+	{
+		for(int y = 0; y < Grid->GridArrayLengthY; y++)
+		{
+			const auto Node = Grid->GetNodeFromArray(x, y); 
+			DrawDebugLine(Grid->GetWorld(), Node->GetWorldCoordinate() + FVector::UpVector * 10,
+				Node->GetWorldCoordinate() + Node->GetDirection() * 20 + FVector::UpVector * 10,
+				FColor::Black, false, -1, 0, 5); 
+		}
+	}
 }
 
 void Pathfinder::SetDirectionInUnwalkableNode(GridNode* NeighbourNode)
