@@ -30,7 +30,7 @@ void Pathfinder::UpdateNodeDirections()
 
 	// If player has not moved (standing in same node), no need to update the flow field. bool check to see if debugging
 	// should be drawn since this optimization otherwise prevents the grid's directions from being drawn 
-	if(!Grid->bDrawDebugStuff && PlayerNode == OldPlayerNode)
+	if(!Grid->bDrawDebugGrid && PlayerNode == OldPlayerNode)
 		return;
 
 	OldPlayerNode = PlayerNode; 
@@ -85,7 +85,7 @@ void Pathfinder::UpdateNodeDirections()
 	}
 	bHasSetDirInUnwalkableNodes = true; // set to true so it is only checked/set once
 
-	if(!Grid->bDrawDebugStuff)
+	if(!Grid->bDrawDebugGrid)
 		return; 
 	
 	// DEBUGGING DISPLAYING DIRECTION
@@ -119,7 +119,7 @@ void Pathfinder::SetDirectionInUnwalkableNode(GridNode* NeighbourNode)
 	}
 
 	// DEBUGGING DRAWING DIRECTION IN UNWALKABLE NODES 
-	if(Grid->bDrawDebugStuff)
+	if(Grid->bDrawDebugGrid)
 		DrawDebugLine(Grid->GetWorld(), NeighbourNode->GetWorldCoordinate() + FVector::UpVector * 10,
 		NeighbourNode->GetWorldCoordinate() + NeighbourNode->GetDirection() * 20 + FVector::UpVector * 10,
 		FColor::Cyan, true, -1, 0, 5);

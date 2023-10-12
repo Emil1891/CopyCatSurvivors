@@ -29,8 +29,8 @@ void AMapGrid::BeginPlay()
 	
 	CreateGrid();
 	
-	if(bDrawDebugStuff) 
-		DrawDebugStuff();
+	if(bDrawDebugGrid) 
+		DrawDebugGrid();
 
 	Pathfind = new Pathfinder(UGameplayStatics::GetPlayerPawn(this, 0), this);
 }
@@ -60,13 +60,9 @@ void AMapGrid::CreateGrid()
 	GridBottomLeft.X -= GridSize.X / 2;
 	GridBottomLeft.Y -= GridSize.Y / 2;
 
-	GridBottomLeftLocation = GridBottomLeft; 
+	GridBottomLeftLocation = GridBottomLeft;
 
-	TArray<AActor*> ActorsToIgnore;
-	TArray<AActor*> OverlappingActors;
-
-	AActor* OverlapActor = GetWorld()->SpawnActor<AActor>(OverlapCheckActorClass, GetActorLocation(),
-	                                                      FRotator::ZeroRotator); 
+	const TArray<AActor*> ActorsToIgnore; 
 	
 	for(int x = 0; x < GridArrayLengthX; x++)
 	{
@@ -76,22 +72,13 @@ void AMapGrid::CreateGrid()
 			NodePos.X += x * NodeDiameter + NodeRadius; // Pos now in node center 
 			NodePos.Y += y * NodeDiameter + NodeRadius;
 
-			// The lines below would be better but they dont seem to work? Should try again when a level is in place
-			// because they seem to detect some (handplaced?) objects? 
-			// const bool bAreaWalkable = UKismetSystemLibrary::SphereOverlapActors(this, NodePos,
-			// 	NodeRadius, UnwalkableObjects, UClass::StaticClass(), ActorsToIgnore,OverlappingActors);
-
-			// AddToArray(x, y, GridNode(bAreaWalkable, NodePos));
+			// Check overlap to see if the node is un-walkable 
+			TArray<AActor*> OverlappingActors; 
+			UKismetSystemLibrary::SphereOverlapActors(this, NodePos, NodeRadius, UnwalkableObjects, AActor::StaticClass(), ActorsToIgnore, OverlappingActors);
 			
-			// This is currently a work around to above but it works fine as of now, but adjusting node radius
-			// requires adjusting the Overlapping actor's mesh's size manually. solution above would not require it
-			OverlapActor->SetActorLocation(NodePos);
-			OverlapActor->GetOverlappingActors(OverlappingActors);
-
 			AddToArray(x, y, GridNode(OverlappingActors.IsEmpty(), NodePos,  x, y));
 		}
 	}
-	OverlapActor->Destroy(); 
 }
 
 int AMapGrid::GetIndex (const int IndexX, const int IndexY) const
@@ -147,13 +134,12 @@ TArray<GridNode*> AMapGrid::GetNeighbours(const GridNode* Node) const
 	return Neighbours; 
 }
 
-void AMapGrid::DrawDebugStuff()
+void AMapGrid::DrawDebugGrid()
 {
 	// Draw border of grid 
 	DrawDebugBox(GetWorld(), GetActorLocation(), FVector(GridSize.X / 2, GridSize.Y / 2, 3), FColor::Red, true);
 
-	// draw each node where unwalkable nodes are red and walkable green
-	int ActualArrayCount = 0; 
+	// draw each node where un-walkable nodes are red and walkable green 
 	for(int x = 0; x < GridArrayLengthX; x++)
 	{
 		for(int y = 0; y < GridArrayLengthY; y++)

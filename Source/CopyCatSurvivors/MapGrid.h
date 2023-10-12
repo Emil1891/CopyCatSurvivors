@@ -62,16 +62,12 @@ private:
 
 	FVector GridBottomLeftLocation; 
 
-	// Not used as of now since that method did not seem to work 
+	// What object types that should be considered as unwalkable  
 	UPROPERTY(EditAnywhere)
-	TArray<TEnumAsByte<EObjectTypeQuery>> UnwalkableObjects;
-
-	// What is used instead to check if a node is walkable (actor checks overlaps)
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> OverlapCheckActorClass;
+	TArray<TEnumAsByte<EObjectTypeQuery>> UnwalkableObjects { TEnumAsByte<EObjectTypeQuery>::EnumType::ObjectTypeQuery1 };
 
 	friend class Pathfinder; 
-	Pathfinder* Pathfind = nullptr; 
+	Pathfinder* Pathfind = nullptr;
 
 #pragma endregion
 
@@ -92,9 +88,9 @@ private:
 #pragma region Debugging
 
 	UPROPERTY(EditAnywhere)
-	bool bDrawDebugStuff = true; 
+	bool bDrawDebugGrid = true; 
 	
-	void DrawDebugStuff();
+	void DrawDebugGrid();
 
 #pragma endregion
 	
